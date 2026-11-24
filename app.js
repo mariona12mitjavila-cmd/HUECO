@@ -9,7 +9,9 @@
   var ENDPOINTS = [
     'https://overpass-api.de/api/interpreter',
     'https://overpass.private.coffee/api/interpreter',
-    'https://overpass.kumi.systems/api/interpreter'
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass.openstreetmap.fr/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
   ];
   var COLORS = {ok:'#1e9e55', warn:'#d98e12', none:'#8a969d'};
   var ETAS = [{l:'Ahora',m:0},{l:'5 min',m:5},{l:'10 min',m:10},{l:'15 min',m:15},{l:'30 min',m:30}];
@@ -72,24 +74,38 @@
     });
     return Object.keys(by).map(function(k){ return by[k]; });
   }
-  function fetchOverpass(i,errs){
-    errs=errs||[];
+  function fetchTile(b,i,errs){
     if(i>=ENDPOINTS.length) return Promise.reject(new Error(errs.join(' · ')||'sin respuesta'));
-    var b=CFG.BBOX||[41.484,2.358,41.545,2.425];
-    var q='[out:json][timeout:40];way["highway"~"^(primary|secondary|tertiary|residential|unclassified|living_street)$"]["name"]('+b.join(',')+');out geom;';
+    var q='[out:json][timeout:25];way["highway"~"^(primary|secondary|tertiary|residential|unclassified|living_street)$"]["name"]('+b.join(',')+');out geom;';
     var ctl=(typeof AbortController!=='undefined')?new AbortController():null;
-    var timer=ctl?setTimeout(function(){ ctl.abort(); },30000):null;
-    var opts={method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(q)};
+    var timer=ctl?setTimeout(function(){ ctl.abort(); },20000):null;
+    var host=ENDPOINTS[i].split('/')[2];
+    var opts={};
     if(ctl) opts.signal=ctl.signal;
-    return fetch(ENDPOINTS[i],opts)
+    // GET sencillo: evita problemas de CORS/preflight en Safari
+    return fetch(ENDPOINTS[i]+'?data='+encodeURIComponent(q),opts)
       .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-      .then(function(j){ if(timer) clearTimeout(timer); if(!j||!j.elements||!j.elements.length) throw new Error('sin datos'); return j; })
-      .catch(function(e){ if(timer) clearTimeout(timer); errs.push(ENDPOINTS[i].split('/')[2]+': '+(e&&e.name==='AbortError'?'tardó demasiado':(e&&e.message)||'error')); return fetchOverpass(i+1,errs); });
+      .then(function(j){ if(timer) clearTimeout(timer); if(!j||!j.elements) throw new Error('sin datos'); return j.elements; })
+      .catch(function(e){ if(timer) clearTimeout(timer); errs.push(host+': '+(e&&e.name==='AbortError'?'tardó demasiado':(e&&e.message)||'error')); return fetchTile(b,i+1,errs); });
+  }
+  function fetchOverpass(){
+    var b=CFG.BBOX||[41.484,2.358,41.545,2.425];
+    var mlat=(b[0]+b[2])/2, mlon=(b[1]+b[3])/2;
+    var tiles=[[b[0],b[1],mlat,mlon],[b[0],mlon,mlat,b[3]],[mlat,b[1],b[2],mlon],[mlat,mlon,b[2],b[3]]];
+    var errs=[], all=[];
+    // un trozo cada vez para no saturar el servidor gratuito
+    return tiles.reduce(function(p,t){
+      return p.then(function(){ return fetchTile(t,0,errs).then(function(els){ all=all.concat(els); }); });
+    },Promise.resolve()).then(function(){
+      if(!all.length) throw new Error('sin datos');
+      var seen={}; all=all.filter(function(w){ if(seen[w.id]) return false; seen[w.id]=1; return true; });
+      return {elements:all};
+    });
   }
   function loadStreets(){
     var c=lsGet(CACHE_KEY);
     if(c){ try{ var d=JSON.parse(c); if(d&&d.length>10) return Promise.resolve(d); }catch(e){} }
-    return fetchOverpass(0).then(function(osm){
+    return fetchOverpass().then(function(osm){
       var d=buildStreets(osm);
       if(d.length<5) throw new Error('muy pocas calles');
       lsSet(CACHE_KEY,JSON.stringify(d));
