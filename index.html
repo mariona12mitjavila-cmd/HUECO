@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>HUECCO</title>
+<meta name="theme-color" id="tc" content="#F5F6F8">
+<script>try{var dm=matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",dm?"dark":"light");document.getElementById("tc").setAttribute("content",dm?"#0A0B0F":"#F5F6F8");}catch(e){}</script>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HUECCO">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=25">
+<link rel="icon" href="icon-192.png?v=25">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Sora:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+:root{--bg:#f3f5f7;--panel:#ffffff;--txt:#1c2a39;--mut:#6b7c8e;--go:#2fae7c;--warn:#e3a82a;--old:#a5b0bc;--chip:#eef2f6;--fade:243,245,247;--wash:255,255,255;--tb:#1c2a39;--tbt:#fff;--sp:#fff;--cb:#1c2a39;--cbt:#fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;touch-action:manipulation;-webkit-text-size-adjust:100%}
+.top,.pills,.bottom,#card,#toast,#onb{touch-action:manipulation}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--txt);background:var(--bg);overflow:hidden;-webkit-user-select:none;user-select:none}
+#map{position:fixed;inset:0;z-index:0;background:var(--bg)}
+.leaflet-container{background:var(--bg)}
+.leaflet-tile-pane{filter:saturate(.85) brightness(1.03) contrast(.96)}
+.leaflet-control-attribution{background:rgba(255,255,255,.7)!important;color:#7a8896!important;font-size:10px}
+.leaflet-control-attribution a{color:#3b6fd8!important}
+.leaflet-bottom.leaflet-left{margin-bottom:150px}
+.maplibregl-ctrl-bottom-left{margin-bottom:150px}.maplibregl-ctrl-bottom-right{margin-bottom:150px}
+.maplibregl-ctrl-attrib{font-size:10px}
+body.dusk .maplibregl-canvas{filter:brightness(.74) contrast(1.05) saturate(.85)}
+#badge>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis}#compass{display:none;margin-left:auto}#compass+.fab{margin-left:0}#compass svg{transition:transform .15s}
+.maplibregl-canvas{outline:none}
+.spotwrap{pointer-events:auto}
+
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.top{position:fixed;z-index:500;left:14px;right:14px;top:max(12px,env(safe-area-inset-top));display:flex;gap:10px;align-items:center;pointer-events:none}
+.badge{min-width:0;overflow:hidden;white-space:nowrap;cursor:pointer;pointer-events:auto;display:flex;align-items:center;gap:11px;background:rgba(var(--wash),.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:28px;padding:10px 18px 10px 14px;box-shadow:0 4px 18px rgba(28,42,57,.14);font-weight:600;font-size:16px;min-height:52px;transition:opacity .4s}
+.badge .dot{flex:none;width:12px;height:12px;border-radius:50%;background:var(--go);box-shadow:0 0 0 5px rgba(47,174,124,.2)}
+.badge.none .dot{background:#aab5c0;box-shadow:none}
+.badge small{display:block;font-weight:400;font-size:12.5px;color:var(--mut);margin-top:1px}
+.fab,.lang{pointer-events:auto;flex:none;width:44px;height:44px;border-radius:50%;background:var(--panel);box-shadow:0 4px 18px rgba(28,42,57,.14);display:flex;align-items:center;justify-content:center;color:#3b6fd8;font-weight:600;font-size:14px}
+.fab{margin-left:auto}
+#toast{position:fixed;z-index:700;left:14px;right:14px;top:calc(max(12px,env(safe-area-inset-top)) + 108px);display:flex;justify-content:center;pointer-events:none}
+.tbox{pointer-events:auto;display:flex;gap:14px;align-items:center;background:var(--tb);color:var(--tbt);border-radius:18px;padding:12px 16px;box-shadow:0 8px 24px rgba(28,42,57,.28);font-weight:500;max-width:560px;font-size:15px}
+.tbox button{background:transparent;color:#9cc0ff;font-weight:600;padding:6px 8px}
+.card{position:fixed;z-index:600;left:14px;right:14px;bottom:calc(196px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto;background:var(--panel);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(28,42,57,.18)}
+.card h2{margin:0;font-size:19px;font-weight:600;padding-right:44px}
+.card .sub{color:var(--mut);margin-top:3px;font-size:14px}
+.card .acts{display:flex;gap:8px;margin-top:14px}
+.card .acts a,.card .acts button{flex:1;min-width:0;text-align:center;text-decoration:none;border-radius:14px;padding:13px 6px;font-weight:600;font-size:15px;background:var(--chip);color:var(--txt)}
+.card .acts .ir{background:#3b6fd8;color:#fff}.card .acts a{font-size:14px}
+.card .acts button[disabled]{opacity:.55}
+.x{position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;background:var(--chip);font-size:20px;line-height:1;color:var(--mut)}
+.bottom{position:fixed;z-index:500;left:0;right:0;bottom:0;padding:0 14px calc(14px + env(safe-area-inset-bottom));pointer-events:none}
+.hint{pointer-events:auto;width:max-content;max-width:calc(100% - 8px);margin:0 auto 10px;padding:8px 16px;border-radius:20px;background:rgba(var(--wash),.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 2px 12px rgba(28,42,57,.12);color:var(--mut);font-size:13.5px;font-weight:500;text-align:center;line-height:1.35}
+.hint:empty{display:none}
+.big{pointer-events:auto;display:flex;gap:6px;max-width:560px;margin:0 auto;padding:8px;border-radius:30px;background:rgba(var(--wash),.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(28,42,57,.18)}
+.big button{flex:1;min-width:0;border-radius:22px;padding:12px 2px 11px;background:transparent;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:600;font-size:13.5px;letter-spacing:.1px;transition:transform .15s,background .15s}
+.big button:active{transform:scale(.96);background:var(--chip)}
+.big .ic{width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center}
+.big .ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.big .go .ic{background:rgba(47,174,124,.14);color:#1f9a6a}
+.big .park .ic{background:rgba(59,111,216,.13);color:#3b6fd8}
+.big .see .ic{background:rgba(42,154,168,.14);color:#238a97}
+.big .lb{line-height:1.15;text-align:center;padding:0 2px}
+
+.spotwrap{background:transparent;border:0}
+.spot{position:relative;width:50px;height:50px;border-radius:50%;border:3px solid var(--sp);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;line-height:1;box-shadow:0 4px 14px rgba(28,42,57,.3);transition:transform .3s}
+.spot b{font-size:20px}.spot i{font-style:normal;font-size:10.5px;font-weight:600;margin-top:1px}
+.spot.f{background:var(--go)}.spot.m{background:var(--warn);color:#3a2a00}.spot.o{background:var(--old)}
+.spot .cnt{position:absolute;top:-9px;right:-9px;min-width:22px;height:22px;border-radius:11px;background:var(--cb);color:var(--cbt);border:2px solid var(--sp);font-style:normal;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.chips{display:flex;gap:8px;margin-top:12px}
+.chips button{flex:1;min-width:0;padding:12px 4px;border-radius:14px;background:var(--chip);color:var(--txt);font-weight:600;font-size:15px}
+.chips button.on{background:#3b6fd8;color:#fff}
+.sheet .sub{margin-top:11px;font-size:13px}.sheet .chips{margin-top:7px}.sheet h2+.sub{margin-top:10px}
+.pills{position:fixed;z-index:500;left:14px;right:14px;top:calc(max(12px,env(safe-area-inset-top)) + 62px);display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}
+.pills button{pointer-events:auto;height:34px;padding:0 13px;border-radius:17px;background:rgba(var(--wash),.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 3px 12px rgba(28,42,57,.14);font-weight:600;font-size:13px;color:var(--txt);white-space:nowrap}
+.pills button.on{background:var(--go);color:#fff}
+.spot .zt{position:absolute;right:-5px;bottom:-5px;width:17px;height:17px;border-radius:50%;border:2px solid var(--sp)}.z-blue{background:#2f6fe0}.z-green{background:#0b7a45}
+.spot.sel{transform:scale(1.22)}
+.spot.f::after{content:'';position:absolute;inset:-9px;border-radius:50%;border:2px solid var(--go);opacity:0;animation:pulse 2.6s ease-out infinite}
+@keyframes pulse{0%{transform:scale(.75);opacity:.6}100%{transform:scale(1.4);opacity:0}}
+.me{width:20px;height:20px;border-radius:50%;background:#2f80ff;border:4px solid #fff;box-shadow:0 0 0 7px rgba(47,128,255,.22),0 2px 8px rgba(28,42,57,.3)}
+#onb{position:fixed;z-index:900;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;padding:24px}
+.onbbox{max-width:360px;width:100%;text-align:center}
+.onbp{width:118px;height:118px;border-radius:50%;background:var(--go);color:#fff;font-size:68px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 30px;box-shadow:0 0 0 14px rgba(47,174,124,.16),0 0 0 32px rgba(47,174,124,.08)}
+.onbbox h1{font-size:28px;font-weight:600;margin:0 0 12px;line-height:1.2}
+.onbbox p{font-size:17px;line-height:1.5;color:var(--mut);margin:0 0 12px}
+.onbbox .tip{font-size:14px;color:#8a98a6}
+.dots{display:flex;gap:8px;justify-content:center;margin:26px 0 22px}
+.dots i{height:8px;border-radius:4px;background:var(--go);transition:width .3s}
+#onbn{width:100%;height:58px;border-radius:20px;background:var(--go);color:#fff;font-size:18px;font-weight:600}
+html[data-theme=dark]{--bg:#0e1621;--panel:#142130;--txt:#e7eef6;--mut:#9db0c4;--go:#3fbf8a;--warn:#d9b44a;--old:#8794a6;--chip:#1e2d3f;--fade:14,22,33;--wash:20,33,48;--tb:#e7eef6;--tbt:#14202e;--sp:#e7eef6;--cb:#0e1621;--cbt:#e7eef6}
+html[data-theme=dark] .leaflet-tile-pane{filter:brightness(.74) contrast(1.05) saturate(.85)}
+html[data-theme=dark] .leaflet-control-attribution{background:rgba(14,22,33,.75)!important;color:#7f93a8!important}
+html[data-theme=dark] .leaflet-control-attribution a{color:#8fb4ff!important}
+html[data-theme=dark] .fab,html[data-theme=dark] .lang{color:#8fb4ff}
+html[data-theme=dark] .tbox button{color:#2d5fc4}
+html[data-theme=dark] .hint{color:#cfdbe8;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+html[data-theme=dark] .big{box-shadow:0 8px 30px rgba(0,0,0,.45)}
+html[data-theme=dark] .big .go .ic{color:#3fbf8a}
+html[data-theme=dark] .big .park .ic{color:#8fb4ff}
+html[data-theme=dark] .big .see .ic{color:#5fcfdb}
+html[data-theme=dark] .badge,html[data-theme=dark] .fab,html[data-theme=dark] .lang,html[data-theme=dark] .card{box-shadow:0 6px 20px rgba(0,0,0,.4)}
+html[data-theme=dark] .spot.f{color:#0e1621}
+html[data-theme=dark] .spot.o{color:#0e1621}
+html[data-theme=dark] .onbp,html[data-theme=dark] #onbn{color:#0e1621}
+.spot.zb{background:#2f6fe0;color:#fff!important}.spot.zg{background:#0b7a45;color:#fff!important}.spot.zo{background:#ec6a1d;color:#fff!important}.spot.pm{background:#6b4fd1;color:#fff!important}
+.spot.zb.o,.spot.zg.o,.spot.zo.o,.spot.pm.o{opacity:.72}
+.spot.zb::after{border-color:#2f6fe0}.spot.zg::after{border-color:#0b7a45}.spot.zo::after{border-color:#ec6a1d}.spot.pm::after{border-color:#6b4fd1}
+.spot.pm b{display:flex}.spot .wc{width:26px;height:26px;fill:#fff}.pills .wc,.chips .wc,.card .wc{width:17px;height:17px;fill:currentColor;vertical-align:-3px;margin-right:5px}.pills button.pm .wc{fill:#fff}
+.tbox.tz-free{background:#1f9a6a}.tbox.tz-blue{background:#2f6fe0}.tbox.tz-green{background:#0b7a45}.tbox.tz-orange{background:#ec6a1d}.tbox.tz-pmr{background:#6b4fd1}
+.tbox[class*=tz-]{color:#fff!important}
+.tbox[class*=tz-] button{color:#fff!important;background:rgba(255,255,255,.22);border-radius:12px;padding:8px 12px}
+.chips button.pm,.pills button.pm{background:#6b4fd1!important;color:#fff!important}
+.chips{flex-wrap:wrap}
+/* ---- v23: aspecto premium ---- */
+:root{--shadow:0 10px 34px rgba(10,24,40,.16),0 2px 6px rgba(10,24,40,.06)}
+body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;-webkit-font-smoothing:antialiased}
+.badge{border-radius:32px;min-height:58px;padding:11px 22px 11px 16px;box-shadow:var(--shadow);font-weight:700;font-size:17px;letter-spacing:-.02em;border:1px solid rgba(255,255,255,.5)}
+.badge small{font-weight:500;font-size:12.5px;letter-spacing:0}
+.badge:not(.none) .dot{animation:dotp 2.4s ease-out infinite}
+@keyframes dotp{0%{box-shadow:0 0 0 0 rgba(47,174,124,.45)}100%{box-shadow:0 0 0 12px rgba(47,174,124,0)}}
+.fab,.lang{width:52px;height:52px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.5);transition:transform .15s}
+.fab:active,.lang:active{transform:scale(.94)}
+.pills button{height:38px;border-radius:19px;font-weight:600;box-shadow:var(--shadow)}
+.big{border-radius:36px;padding:9px;box-shadow:0 16px 48px rgba(10,24,40,.22),0 2px 8px rgba(10,24,40,.06);border:1px solid rgba(255,255,255,.55)}
+.big button{border-radius:28px;padding:12px 2px 11px;font-size:13px;font-weight:600;letter-spacing:-.005em}
+.big .ic{width:52px;height:52px;border-radius:19px}
+.card{border-radius:30px;padding:20px 20px 20px;box-shadow:0 -6px 44px rgba(10,24,40,.22),0 2px 8px rgba(10,24,40,.08);border:1px solid rgba(255,255,255,.4)}
+.card::before{content:'';display:block;width:38px;height:4px;border-radius:2px;background:var(--chip);margin:-8px auto 14px}
+.card.enter{animation:up .34s cubic-bezier(.2,.9,.3,1)}
+@keyframes up{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.card h2{font-size:22px;font-weight:700;letter-spacing:-.022em}
+.ct{display:flex;align-items:center;gap:10px;padding-right:46px}.ct h2{padding:0;margin:0}
+.zd{width:12px;height:12px;border-radius:50%;flex:none}.zd-free{background:#2fae7c}.zd-blue{background:#2f6fe0}.zd-green{background:#0b7a45}.zd-orange{background:#ec6a1d}.zd-pmr{background:#6b4fd1}
+.rel{margin-left:auto;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:10px;white-space:nowrap}
+.relHi{background:rgba(47,174,124,.16);color:#1a8a5d}.relMid{background:rgba(227,168,42,.2);color:#9a6b00}.relLow{background:rgba(150,160,175,.22);color:var(--mut)}
+.card .sub{font-size:14px;margin-top:6px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tags span{display:inline-flex;align-items:center;background:var(--chip);color:var(--txt);font-size:12.5px;font-weight:600;padding:6px 10px;border-radius:10px}
+.tags .t-blue{background:rgba(47,111,224,.14);color:#2f6fe0}.tags .t-green{background:rgba(11,122,69,.14);color:#0b7a45}.tags .t-orange{background:rgba(236,106,29,.15);color:#d4580e}.tags .t-free{background:rgba(47,174,124,.15);color:#1a8a5d}.tags .t-pm{background:rgba(107,79,209,.15);color:#6b4fd1}.tags .t-ev{background:rgba(47,174,124,.15);color:#1a8a5d}
+.bar{height:4px;border-radius:2px;background:var(--chip);margin-top:14px;overflow:hidden}.bar i{display:block;height:100%;border-radius:2px;background:#a5b0bc}
+.rl-relHi i{background:#2fae7c}.rl-relMid i{background:#e3a82a}.rl-relLow i{background:#a5b0bc}
+.card .acts{margin-top:16px;gap:10px}
+.card .acts a,.card .acts button{border-radius:17px;padding:15px 6px;font-size:15px}
+.card .acts .ir{background:var(--txt);color:var(--panel)}
+.chips button.on{background:var(--txt);color:var(--panel)}
+.tbox{border-radius:22px;padding:14px 18px;font-weight:600;box-shadow:0 14px 40px rgba(10,24,40,.3);letter-spacing:-.01em}
+.poi{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;border:2px solid #fff;box-shadow:0 3px 10px rgba(10,24,40,.28)}
+.p-ev{background:#1f7aec}.p-pk{background:#3a4a5d;font-size:17px}.p-pm{background:#6b4fd1}.poi .wc{width:20px;height:20px;fill:#fff}
+.spot{width:48px;height:48px;background-image:linear-gradient(160deg,rgba(255,255,255,.24),rgba(0,0,0,.06));box-shadow:0 6px 18px rgba(10,24,40,.3)}
+.spriv{margin:18px 4px 0;color:var(--mut);font-size:13px}.spriv summary{cursor:pointer;font-weight:600;padding:6px 0}.spriv p{line-height:1.5;margin:6px 0 0}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+@keyframes fup{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+#onb{background:radial-gradient(900px 700px at 30% 10%,#1b3a5e,#0f1c2e 64%);color:#fff}
+.onbp{width:auto;height:auto;background:none;box-shadow:none;margin:0 auto 30px}.onbp svg{width:108px;height:108px;filter:drop-shadow(0 18px 40px rgba(47,174,124,.4))}
+.onbbox h1{color:#fff;font-weight:800;letter-spacing:-.03em}.onbbox p{color:#b8c7d9}.onbbox .tip{color:#8aa0b8}
+.dots i{background:#3fbf8a}#onbn{background:#fff;color:#0f1c2e;font-weight:700;border-radius:22px}
+html[data-theme=dark] .badge,html[data-theme=dark] .fab,html[data-theme=dark] .lang,html[data-theme=dark] .big,html[data-theme=dark] .card{border-color:rgba(255,255,255,.07)}
+html[data-theme=dark] .relHi{color:#4ad39b}html[data-theme=dark] .relMid{color:#e8c25a}
+html[data-theme=dark] .tags .t-blue{color:#7fa8ff}html[data-theme=dark] .tags .t-green{color:#4ad39b}html[data-theme=dark] .tags .t-orange{color:#ff9a5c}html[data-theme=dark] .tags .t-pm{color:#a893ff}html[data-theme=dark] .tags .t-free,html[data-theme=dark] .tags .t-ev{color:#4ad39b}
+html[data-theme=dark] .p-pk{background:#56687e}
+#set{display:none}
+#set.open{display:block;position:fixed;inset:0;z-index:800;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.sin{max-width:560px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+.sh{display:flex;align-items:center;justify-content:space-between;margin:4px 0 6px}.sh h1{font-size:28px;margin:0;font-weight:700}
+.sgt{font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mut);margin:22px 6px 8px}
+.sg{background:var(--panel);border-radius:20px;padding:2px 16px;box-shadow:0 2px 12px rgba(28,42,57,.08)}
+.srow,.sblock{padding:14px 0;border-bottom:1px solid var(--chip)}.sg>:last-child{border-bottom:0}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;text-align:left;background:transparent;color:var(--txt)}
+.sl{font-weight:600;font-size:15.5px}.sl small{display:block;color:var(--mut);font-size:12.5px;font-weight:400;margin-top:2px}
+.sblock .sl{margin-bottom:10px}
+.seg{display:flex;gap:3px;background:var(--chip);border-radius:12px;padding:3px}
+.seg button{flex:1;min-width:0;padding:10px 2px;border-radius:10px;background:transparent;font-weight:600;font-size:13.5px;color:var(--mut)}
+.seg button.on{background:var(--panel);color:#3b6fd8;box-shadow:0 1px 5px rgba(0,0,0,.18)}
+.sw{flex:none;width:52px;height:32px;border-radius:16px;background:#c6cfd9;position:relative;transition:background .2s}
+.sw i{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:left .2s}
+.sw.on{background:var(--go)}.sw.on i{left:23px}
+.chev{color:var(--mut);font-size:24px;line-height:1}
+.sabout{text-align:center;color:var(--mut);font-size:12.5px;margin:26px 10px 0;line-height:1.5}
+.lang{position:relative}.lang.dot::after{content:'';position:absolute;top:7px;right:7px;width:11px;height:11px;border-radius:50%;background:var(--go);border:2px solid var(--panel)}
+html[data-theme=dark] .sw{background:#3a4a5d}html[data-theme=dark] .sw.on{background:var(--go)}html[data-theme=dark] .sg{box-shadow:none}
+.spot .evb{position:absolute;right:-7px;bottom:-7px;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #1f9a6a;font-size:12px;line-height:18px;text-align:center;text-decoration:none}
+html[data-theme=dark] .maplibregl-ctrl-attrib{background:rgba(14,22,33,.75)!important;color:#7f93a8!important}html[data-theme=dark] .maplibregl-ctrl-attrib a{color:#8fb4ff!important}
+@media (prefers-reduced-motion:reduce){.spot.f::after{animation:none}*{transition:none!important}}
+/* ---- v24: identidad HUECCO (neutro, Sora + Manrope, color solo en zonas) ---- */
+:root{--bg:#F5F6F8;--panel:#FFFFFF;--txt:#0B0D12;--mut:#5E6470;--chip:#ECEEF2;--line:#E3E5EA;--ink:#0B0D12;--onink:#FFFFFF;--accent:#2336FF;--zg:#1FB55A;--zb:#2AA0FF;--zo:#FF8A1F;--go:#0B0D12;--fade:245,246,248;--wash:255,255,255;--tb:#0B0D12;--tbt:#FFFFFF;--sp:#FFFFFF;--cb:#0B0D12;--cbt:#FFFFFF;--shadow:0 6px 22px rgba(11,13,18,.14)}
+html[data-theme=dark]{--bg:#0A0B0F;--panel:#14161C;--txt:#F4F5F7;--mut:#9AA0AC;--chip:#1E212A;--line:#262A33;--ink:#F4F5F7;--onink:#0A0B0F;--accent:#6C82FF;--zg:#34D27B;--zb:#6DBBFF;--zo:#FFA23A;--go:#F4F5F7;--fade:10,11,15;--wash:20,22,28;--tb:#F4F5F7;--tbt:#0A0B0F;--sp:#14161C;--cb:#F4F5F7;--cbt:#0A0B0F;--shadow:0 6px 22px rgba(0,0,0,.55)}
+body,button,input{font-family:Manrope,system-ui,-apple-system,'Segoe UI',sans-serif;letter-spacing:0}
+h1,h2,h3,.num,.card h2,.onbbox h1,.sgt,.set h1,.sw-word{font-family:Sora,Manrope,system-ui,sans-serif}
+.ic24{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wc{width:18px;height:18px;fill:none!important;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-4px}
+/* contador */
+.badge{border:0;border-radius:22px;min-height:0;padding:12px 18px 12px 16px;background:var(--panel);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--shadow);gap:0;display:flex;align-items:center}
+.badge .dot{display:none}
+#bt{display:flex;align-items:baseline;gap:10px;font-weight:500;font-size:14px;color:var(--mut)}
+#bt .num{font-weight:600;font-size:38px;line-height:1;letter-spacing:-.02em;color:var(--txt);font-variant-numeric:tabular-nums}
+.badge.none #bt{font-family:Sora,sans-serif;font-weight:600;font-size:17px;color:var(--txt)}
+.badge small{font-weight:500;font-size:12.5px;color:var(--mut);margin-top:3px}
+.fab,.lang{width:48px;height:48px;border:0;background:var(--panel);box-shadow:var(--shadow);color:var(--txt)}
+.fab{color:var(--accent)}
+html[data-theme=dark] .fab,html[data-theme=dark] .lang{color:var(--txt)}html[data-theme=dark] .fab{color:var(--accent)}
+.lang.dot::after{background:var(--accent);border-color:var(--panel)}
+.pills button{height:44px;border-radius:22px;background:var(--panel);box-shadow:var(--shadow);font-weight:700;border:0;color:var(--txt);-webkit-backdrop-filter:none;backdrop-filter:none}
+.pills button.on,.chips button.on{background:var(--ink)!important;color:var(--onink)!important}
+/* dock */
+.big{border:0;border-radius:30px;padding:8px;gap:4px;background:var(--panel);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 8px 30px var(--shadow)}
+.big button{border-radius:22px;padding:12px 4px;gap:6px;font-weight:700;font-size:12.5px;color:var(--txt)}
+.big .ic{width:auto;height:auto;background:none!important;color:var(--txt)!important;border-radius:0}
+.big .ic svg{width:24px;height:24px;stroke-width:1.8}
+/* puntos del mapa */
+.pt{position:relative;width:48px;height:48px;display:flex;align-items:center;justify-content:center}
+.pt i{display:block;width:26px;height:26px;border-radius:50%;border:3px solid var(--sp);box-shadow:0 2px 8px var(--shadow);background:var(--ink);transition:transform .18s}
+.pt.zg i{background:var(--zg)}.pt.zb i{background:var(--zb)}.pt.zo i{background:var(--zo)}
+.pt.old i{opacity:.55}
+.pt.sel i{transform:scale(1.4);box-shadow:0 0 0 9px color-mix(in srgb,var(--zb) 28%,transparent),0 2px 8px var(--shadow)}
+.pt .bd{position:absolute;left:30px;top:2px;width:20px;height:20px;border-radius:50%;background:var(--panel);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px var(--shadow);color:var(--txt);text-decoration:none}
+.pt .bd .ic24{width:13px;height:13px;stroke-width:2.2}
+.pt .bd2{left:30px;top:24px}
+.pt .cnt{position:absolute;left:2px;top:2px;min-width:18px;height:18px;border-radius:9px;padding:0 4px;background:var(--ink);color:var(--onink);font:700 11px/18px Manrope,sans-serif;text-align:center;font-style:normal}
+.me{background:var(--accent);border:3px solid var(--panel);box-shadow:0 0 0 10px color-mix(in srgb,var(--accent) 22%,transparent),0 2px 8px var(--shadow)}
+.poi{width:36px;height:36px;border-radius:12px;background:var(--ink);color:var(--onink);display:flex;align-items:center;justify-content:center;border:2px solid var(--sp);box-shadow:0 3px 10px var(--shadow)}
+.poi .ic24{width:20px;height:20px}
+/* tarjetas */
+.card{border:0;border-radius:30px;background:var(--panel);box-shadow:0 -10px 40px var(--shadow)}
+.card h2{font-weight:600;font-size:22px;letter-spacing:-.01em}
+.ct .zd{display:none}
+.rel{background:var(--chip)!important;color:var(--mut)!important;font-weight:700}
+.tags span,.tags .t-blue,.tags .t-green,.tags .t-orange,.tags .t-free,.tags .t-pm,.tags .t-ev{background:var(--chip)!important;color:var(--txt)!important;font-weight:600;gap:6px}
+.tags .ic24,.tags .wc{width:16px;height:16px}
+.zdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ink);margin-right:2px}.zdot.z-blue{background:var(--zb)}.zdot.z-green{background:var(--zg)}.zdot.z-orange{background:var(--zo)}
+.bar i,.rl-relHi i,.rl-relMid i,.rl-relLow i{background:var(--ink)}
+.card .acts a,.card .acts button{border-radius:16px}
+.card .acts .ir{background:var(--ink);color:var(--onink)}
+.chips button .ic24{width:18px;height:18px;vertical-align:-4px;margin-right:4px}
+/* avisos */
+.tbox,.tbox[class*=tz-]{background:var(--tb)!important;color:var(--tbt)!important;border-radius:22px;position:relative;padding-left:34px}
+.tbox[class*=tz-]::before{content:'';position:absolute;left:14px;top:50%;margin-top:-6px;width:12px;height:12px;border-radius:50%;background:var(--zb)}
+.tbox.tz-free::before{background:var(--tbt)}.tbox.tz-green::before{background:var(--zg)}.tbox.tz-orange::before{background:var(--zo)}.tbox.tz-pmr::before{background:var(--accent)}
+.tbox[class*=tz-] button,.tbox button{background:var(--tbt)!important;color:var(--tb)!important;border-radius:12px;padding:8px 12px}
+/* ajustes */
+.seg{background:var(--chip)}.seg button.on{background:var(--ink);color:var(--onink);box-shadow:none}
+.sw.on,html[data-theme=dark] .sw.on{background:var(--accent)}
+.sg{box-shadow:none;border-radius:22px}.sgt{letter-spacing:.04em}
+.sh{font-family:Sora,sans-serif}
+/* intro de marca */
+.splash{position:fixed;inset:0;z-index:1000;background:#2336FF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;color:#fff}
+.splash svg{width:156px;height:156px;overflow:visible}
+.splash .hb,.splash .blk,.splash .ping,.splash .ping2{transform-box:fill-box;transform-origin:center}
+.splash .hb{fill:#fff}.splash .blk{fill:#D4FF3A}
+.splash .ping,.splash .ping2{fill:none;stroke:#D4FF3A;stroke-width:2;opacity:0}
+.splash .cone,.splash .road,.splash .trail{opacity:0}
+.splash .road{stroke:#CBD0FF;stroke-width:2.5;stroke-dasharray:10 14}
+.splash .sw-word{font-weight:700;font-size:27px;letter-spacing:.3em;padding-left:.3em;color:#fff}
+.splash .sw-word span{display:inline-block;opacity:0}
+@keyframes ping{from{opacity:.7;transform:scale(1)}to{opacity:0;transform:scale(3.4)}}
+@keyframes letter{from{opacity:0;transform:translateY(16px);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes inL{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+@keyframes inR{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes drive{0%{transform:translateY(250px);animation-timing-function:cubic-bezier(.1,.7,.3,1)}72%{transform:translateY(-5px);animation-timing-function:ease-out}100%{transform:none}}
+@keyframes lit{0%,86%{fill:#CBD0FF}100%{fill:#fff}}
+@keyframes cone{0%{opacity:.55}75%{opacity:.55}100%{opacity:0}}
+@keyframes trail{0%{opacity:.8}70%{opacity:.5}100%{opacity:0}}
+@keyframes roadm{0%{opacity:.6;stroke-dashoffset:0}75%{opacity:.6}100%{opacity:0;stroke-dashoffset:-300}}
+.splash.play .road{animation:roadm .9s 0s linear both}
+.splash.play .hb-l{animation:inL .25s ease-out both,lit .85s .1s linear both}
+.splash.play .hb-r{animation:inR .25s ease-out both,lit .85s .1s linear both}
+.splash.play .car{animation:drive .85s .1s both}
+.splash.play .cone{animation:cone .85s .1s linear both}
+.splash.play .trail{animation:trail .85s .1s linear both}
+.splash.play .ping{animation:ping .55s .95s ease-out both}
+.splash.play .ping2{animation:ping .55s 1.05s ease-out both}
+.splash.play .sw-word span{animation:letter .35s ease-out both}
+.splash.play .sw-word span:nth-child(1){animation-delay:1s}.splash.play .sw-word span:nth-child(2){animation-delay:1.04s}.splash.play .sw-word span:nth-child(3){animation-delay:1.08s}.splash.play .sw-word span:nth-child(4){animation-delay:1.12s}.splash.play .sw-word span:nth-child(5){animation-delay:1.16s}.splash.play .sw-word span:nth-child(6){animation-delay:1.2s}
+.splash.hide{opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+/* bienvenida */
+#onb{background:#2336FF;color:#fff}
+.onbp{width:auto;height:auto;background:none;box-shadow:none;border-radius:0;margin:0 auto 30px}.onbp svg{width:104px;height:104px;filter:none}
+.onbbox h1{color:#fff;font-weight:600;letter-spacing:-.01em}.onbbox p{color:#CBD0FF}.onbbox .tip{color:#CBD0FF}
+.dots i{background:#D4FF3A}
+#onbn{background:#D4FF3A;color:#0A1200;font-weight:700;border-radius:16px}
+/* v25 */
+.pills{top:calc(max(12px,env(safe-area-inset-top)) + 100px)}
+.card{bottom:calc(112px + env(safe-area-inset-bottom))}
+.hintp{margin-top:10px;font-size:12.5px;line-height:1.45;color:var(--mut)}
+.poi{width:40px;height:40px;border-radius:14px}.poi .ic24{width:22px;height:22px}
+.poi.k-ev{background:#2336FF;color:#fff}html[data-theme=dark] .poi.k-ev{background:#6C82FF;color:#0A0B0F}
+.spotwrap:has(.me){z-index:1!important}.spotwrap:has(.poi){z-index:2!important}.spotwrap:has(.pt){z-index:3!important}
+</style>
+</head>
+<body>
+<div id="map" role="application" aria-label="Mapa"></div>
+<div class="top">
+  <div id="badge" class="badge none" role="button" data-a="all" aria-live="polite"><span class="dot"></span><span><span id="bt">…</span><small id="bs"></small></span></div>
+  <button type="button" class="fab" id="compass" aria-label="Norte / Norte"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l4 9h-8z" fill="currentColor"/><path d="M12 21l-4-9h8z" opacity=".35" fill="currentColor"/></svg></button>
+  <button type="button" class="fab" id="loc" aria-label="Centrar / Centrar">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg>
+  </button>
+  <button type="button" class="lang" id="gear" aria-label="Ajustes"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg></button>
+</div>
+<div class="pills" id="pills"></div>
+<div id="toast"></div>
+<div id="card"></div>
+<div class="bottom">
+  <div class="hint" id="hint"></div>
+  <div class="big">
+    <button type="button" class="go" id="bgo"></button>
+    <button type="button" class="park" id="bpark"></button>
+    <button type="button" class="see" id="bsee"></button>
+  </div>
+</div>
+<div id="set"></div>
+<div id="splash"></div>
+<div id="onb"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+/* la pantalla no se amplía con pellizco ni doble toque; solo el mapa hace zoom */
+document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
+document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});
+document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1&&!(e.target.closest&&e.target.closest('#map')))e.preventDefault();},{passive:false});
+var lastTap=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-lastTap<350&&!(e.target.closest&&e.target.closest('#map')))e.preventDefault();lastTap=n;},{passive:false});
+</script>
+<script>window.addEventListener('error',function(e){var b=document.getElementById('bs');if(b)b.textContent='Error: '+e.message;});</script>
+<script src="config.js?v=7"></script>
+<script>
+(function(){
+  'use strict';
+  var CFG = window.PLAZAS_CONFIG || {};
+  var REMOTE = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY);
+  var TTL = 15*60000;            // un hueco avisado dura 15 minutos
+  var POLL = 15000;              // refresco de avisos
+  var NEAR_M = 600;
+  var ALERT_M = (lsGet('hueco-alert')===null)?600:Number(lsGet('hueco-alert'));   // 0 = no avisar
+  var VIB = lsGet('hueco-vib')!=='0';
+  var AUTO = lsGet('hueco-auto')!=='0';
+  var AD = {fix:null,drive:0,slowT:0,lastAsk:0,lastGo:0};
+  function speedOf(p){
+    var la=p.coords.latitude, ln=p.coords.longitude, t=p.timestamp||Date.now(), v=null;
+    if(typeof p.coords.speed==='number'&&p.coords.speed>=0) v=p.coords.speed;
+    else if(AD.fix){ var dt=(t-AD.fix.t)/1000; if(dt>0.4&&dt<90) v=distPt(AD.fix.pos,[la,ln])/dt; }
+    AD.fix={t:t,pos:[la,ln]}; return v;
+  }
+  function autoDetect(p){
+    var v=speedOf(p); if(!AUTO||v===null||S.sheet||S.settings||(p.coords.accuracy&&p.coords.accuracy>80)) return;
+    var now=Date.now(), pos=[p.coords.latitude,p.coords.longitude];
+    if(v>=4){
+      AD.drive=Math.min(AD.drive+1,12); AD.slowT=0;
+      var car=getCar();
+      if(car&&AD.drive>=2&&now-AD.lastGo>30*60000&&now-car.t>3*60000&&distPt(pos,[car.lat,car.lng])<=120){ AD.lastGo=now; showToast(tr('autoGo'),null,16000,'autogo'); }
+    }else if(v<2.5){
+      if(AD.drive>=3){
+        if(!AD.slowT) AD.slowT=now;
+        else if(now-AD.slowT>=25000&&now-AD.lastAsk>10*60000&&!S.notice){ AD.lastAsk=now; AD.drive=0; AD.slowT=0; showToast(tr('autoPark'),null,16000,'autopark'); }
+      }
+    }
+  }
+  var PAYAFTER = lsGet('hueco-payafter')!=='0';   // al pulsar «He aparcado» se abre el pago de la zona              // «cerca» = 600 m
+  var ZONE_M = Number(lsGet('hueco-radius'))||2000;             // «tu zona» = 2 km a la redonda (el contador solo cuenta esto)
+  var ORD = {moto:0,small:1,medium:2,large:3};
+  var MERGE_M = 20;              // «he aparcado» a menos de 20 m de un hueco lo ocupa
+  var CONF_EXTRA = 5*60000, CONF_MAX = 4; // cada confirmación de otro vecino alarga el aviso 5 min (hasta 4)
+  function ttlOf(r){ return TTL+Math.min(Math.max(r.conf||0,0),CONF_MAX)*CONF_EXTRA; }
+  function isPaid(z){ return z==='blue'||z==='green'||z==='orange'; }
+  var GHOST = 3*3600000;         // un hueco caducado se «recuerda» 3 h: si pasas por él, te pregunta si sigue ahí
+  var GHOST_M = 20;
+  var MAP_M = 6000;              // en el mapa solo se dibujan los huecos a menos de 6 km del centro
+  var COOLDOWN = 45000;          // 45 s entre avisos del MISMO tipo (tipos distintos no esperan)
+  var CACHE_KEY = 'plazas-calles-v2', CACHE_OLD = 'plazas-calles-v1';
+  var B = CFG.BBOX || [41.484,2.358,41.545,2.425];
+  var ENDPOINTS = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.private.coffee/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass.openstreetmap.fr/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+  ];
+
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function norm(t){ return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim(); }
+  function uuid(){
+    if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){ var r=Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); });
+  }
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function round4(x){ return Math.round(x*10000)/10000; }
+  var MINE=[]; try{ MINE=JSON.parse(lsGet('hueco-mine')||'[]'); }catch(e){}
+  function addMine(id){ MINE.push(id); MINE=MINE.slice(-30); lsSet('hueco-mine',JSON.stringify(MINE)); }
+
+  /* ---------- idioma (català / castellano) ---------- */
+  var LANG = lsGet('hueco-lang') || ((function(){ var ls=(navigator.languages||[navigator.language||'es']); for(var i=0;i<ls.length;i++){ if(/^ca/i.test(ls[i])) return 'ca'; if(/^es/i.test(ls[i])) return 'es'; if(/^en/i.test(ls[i])) return 'en'; } return 'es'; })());
+  var TX = {
+    ca:{loading:'Carregant…',one:'{0} lloc lliure',many:'{0} llocs lliures',near:'{0} a menys de {1} m de tu',zone:'a menys de {0} km',none:'Tot tranquil',noneSub:'Sigues el primer a avisar',
+      gps:'Sense ubicació: en avisar, tocaràs el mapa per marcar on ets',nearest:'Més proper: {0} · {1}',tap:'Toca un punt verd per veure el lloc',empty:'Quan algú se\'n vagi, veuràs aquí el seu lloc',
+      now:'ara mateix',ago:'fa {0} min',srv:'Sense connexió amb el servidor ({0})',fresh:'Lloc lliure a {0}!',undo:'Desfés',
+      cardT:'Lloc lliure',mine:'(teu)',conf:'{0} confirmacions',go:'Anar-hi',still:'Segueix lliure',gone:'Ja no hi és',thanks:'Gràcies',del:'Treu el meu avís',
+      wait:'Espera un moment abans de tornar a avisar.',pick:'Toca el mapa on ets ara mateix.',seeMore:'Veig un altre lloc',howmany:'Quants llocs veus?',howmanyGo:'Quin lloc deixes?',sizeQ:'Mida (opcional)',z_moto:'Moto',z_car:'Cotxe',z_small:'Petit',z_medium:'Mitjà',z_large:'Gran',send:'Enviar',spotsN:'{0} llocs',nogps:'No veig la teva ubicació. Activa-la a Ajustaments › Safari › Ubicació.',dup:'Aquest lloc ja estava avisat. L\'he confirmat, gràcies!',
+      sentSee:'Fet! Acabes d\'estalviar voltes a algú',sentGo:'Fet! Algú aparcarà gràcies a tu',parked:'Anotat. Si hi havia un lloc aquí, ja no surt.',fail:'No s\'ha pogut enviar ({0}).',
+      bGo:'Me\'n vaig',bGoS:'deixo el meu lloc',bPk:'He aparcat',bPkS:'ocupo un lloc',bSee:'Veig un lloc',bSeeS:'a peu',
+      o1t:'Troba lloc sense donar voltes',o1:'Veuràs en un mapa els llocs que els veïns acaben d\'alliberar.',
+      o2t:'Tres tocs',o2:'Me\'n vaig · He aparcat · Veig un lloc. Sense registre i anònim.',
+      o3t:'Ajuda\'ns a començar',o3:'Quan surtis o aparquis, prem el botó. Cada avís ajuda un veí. Permet la ubicació quan te la demani.',tip:'Consell: Compartir › Afegeix a la pantalla d\'inici',next:'Següent',start:'Començar',
+      closer:'Lloc nou a {0}, més a prop que el teu destí ({1})',ask:'Ets al lloc? Segueix lliure?',ghost:'Aquí hi havia un lloc. Hi segueix?',thx2:'Gràcies! Lloc reactivat',dirQ:'Carrer (opcional)',d_two:'Doble sentit',d_one:'Sentit únic',zoneQ:'Zona d\'aparcament (opcional)',zn_free:'Lliure',zn_blue:'Zona blava',zn_green:'Zona verda',
+      freeOnly:'Només gratuïts',veh:'Vehicle',vehAll:'Tots',carT:'El meu cotxe',carSub:'aparcat fa {0}',carForget:'Oblida',carSaved:' He guardat on tens el cotxe.',payTag:'de pagament',payBtn:'Pagar zona blava',payT:'Pagar la zona blava',payIn:'a {0}',payOpen:'Obre l\'app oficial',payWeb:'Web de l\'operador',payOther:'Altres apps habituals',payNone:'No tenim l\'app exacta d\'aquest municipi. Prova una d\'aquestes o cerca-la:',paySearch:'Cerca l\'app de {0}',payNote:'Pagues dins l\'app oficial del municipi. HUECCO no cobra ni guarda dades de pagament.',payUnk:'el teu municipi',zn_orange:'Zona taronja',zs_free:'Lliure',zs_blue:'Blava',zs_green:'Verda',zs_orange:'Taronja',adaptedChip:'Plaça adaptada (PMR)',pmrOff:'Adaptades',pmrOn:'Amb adaptades',pmrOnly:'Només adaptades',pmrTag:'Plaça adaptada (només amb targeta PMR)',themeAuto:'Auto',themeLight:'Clar',themeDark:'Fosc',evChip:'Amb punt de càrrega elèctrica',evPill:'Amb càrrega',evTag:'Punt de càrrega',setT:'Ajustaments',close:'Tanca',setApp:'Aplicació',setLang:'Idioma',setTheme:'Aspecte',thAuto:'Com el mòbil',thLight:'Clar',thDark:'Fosc',setFilt:'Quins llocs vull veure',setVeh:'El meu vehicle',setPmr:'Places adaptades (PMR)',pmrNo:'No',pmrIn:'Sí',pmrOnly2:'Només adaptades',setFree:'Només llocs gratuïts',setFreeS:'Amaga zona blava, verda i taronja',setEv:'Només amb punt de càrrega',setNot:'Avisos',setRadius:'Compto els llocs a l\'entorn de',setAlert:'Avisa\'m quan surti un lloc a',alOff:'No avisar',setVib:'Vibració en un avís',setMore:'Més',setNav:'App de navegació',navAsk:'Preguntar',setPayS:'Obre l\'app oficial del municipi',setIntro:'Veure la introducció',setAbout:'Anònim: no demanem registre ni guardem dades personals.',setPayAfter:'Pagar en aparcar',setPayAfterS:'En prémer «He aparcat» obre l\'app oficial del municipi',payAfterNote:'He guardat on has aparcat. Si és zona de pagament, paga ara:',payNo2:'Zona gratuïta · no cal pagar',tagline:'Aparca sense donar voltes',lyParkS:'Aparcaments públics coberts o soterranis. No diuen si hi ha lloc lliure',lyPmrS:'Places PMR marcades al mapa. No diuen si estan lliures',pmrHint:'No: no veus les places adaptades. Sí: les veus amb les altres. Només adaptades: només veus aquestes.',oneW:'hueco lliure',manyW:'huecos lliures',pmrShort:'Plaça adaptada',relT:'Fiabilitat',relHi:'Molt fiable',relMid:'Fiable',relLow:'Pot haver canviat',setLay:'Més coses al mapa',lyEv:'Punts de càrrega',lyPark:'Aparcaments',lyPmr:'Places adaptades fixes',lyS:'Cargadors públics a prop teu, a més dels que avisen els veïns',poiEv:'Punt de càrrega',poiPark:'Aparcament públic',poiPmr:'Plaça PMR',poiPts:'{0} punts',poiSpots:'{0} places',poiFee:'De pagament',poiFree:'Gratuït',poiSrc:'Dades d\'OpenStreetMap: poden no estar al dia. No indica si hi ha lloc lliure.',autoPark:'Has aparcat aquí?',autoParkYes:'Sí, he aparcat',autoNo:'No',autoGo:'Te\'n vas? Avisa el teu lloc als veïns',autoGoYes:'Avisar',setAuto:'Detecció automàtica (beta)',setAutoS:'Et pregunta si has aparcat o te\'n vas. Funciona amb l\'app oberta',setPriv:'Privacitat',privTxt:'No cal registre. La teva ubicació només s\'usa al mòbil per mostrar-te els llocs a prop i, quan avises, s\'envia arrodonida (uns 10 m) amb un identificador aleatori del dispositiu, sense nom ni correu. Els avisos es mostren durant 12 hores. Text informatiu: pendent de revisió legal.'},
+    en:{loading:'Loading…',one:'{0} free spot',many:'{0} free spots',near:'{0} within {1} m of you',zone:'within {0} km',none:'All quiet',noneSub:'Be the first to report one',
+      gps:'No location: when you report, tap the map to mark where you are',nearest:'Nearest: {0} · {1}',tap:'Tap a green dot to see the spot',empty:'When someone leaves, you will see their spot here',
+      now:'just now',ago:'{0} min ago',srv:'No connection to the server ({0})',fresh:'Free spot {0} away!',undo:'Undo',
+      cardT:'Free spot',mine:'(yours)',conf:'confirmed by {0}',go:'Go',still:'Still free',gone:'Gone',thanks:'Thanks',del:'Remove my report',
+      wait:'Wait a moment before reporting again.',pick:'Tap the map where you are right now.',seeMore:'I see another spot',howmany:'How many spots do you see?',howmanyGo:'Which spot are you leaving?',sizeQ:'Size (optional)',z_moto:'Motorbike',z_car:'Car',z_small:'Small',z_medium:'Medium',z_large:'Large',send:'Send',spotsN:'{0} spots',nogps:'I cannot see your location. Turn it on in Settings › Safari › Location.',dup:'That spot was already reported. I confirmed it, thanks!',
+      sentSee:'Done! You just saved someone from circling',sentGo:'Done! Someone will park thanks to you',parked:'Noted. If there was a spot here, it is gone now.',fail:'Could not send ({0}).',
+      bGo:'I\'m leaving',bGoS:'my spot is free',bPk:'I parked',bPkS:'I take a spot',bSee:'I see a spot',bSeeS:'on foot',
+      o1t:'Find a spot without circling',o1:'You will see on a map the spots your neighbours have just freed.',
+      o2t:'Three taps',o2:'I\'m leaving · I parked · I see a spot. No sign-up, anonymous.',
+      o3t:'Help us get started',o3:'When you leave or park, tap the button. Every report helps a neighbour. Allow location when asked.',tip:'Tip: Share › Add to Home Screen',next:'Next',start:'Start',
+      closer:'New spot {0} away, closer than your destination ({1})',ask:'Are you at the spot? Still free?',ghost:'There was a spot here. Still there?',thx2:'Thanks! Spot reactivated',dirQ:'Street (optional)',d_two:'Two-way',d_one:'One-way',zoneQ:'Parking zone (optional)',zn_free:'Free',zn_blue:'Blue zone',zn_green:'Green zone',
+      freeOnly:'Free only',veh:'Vehicle',vehAll:'Any',carT:'My car',carSub:'parked {0} ago',carForget:'Forget',carSaved:' I saved where your car is.',payTag:'paid',payBtn:'Pay blue zone',payT:'Pay the blue zone',payIn:'in {0}',payOpen:'Open the official app',payWeb:'Operator website',payOther:'Other common apps',payNone:'We don\'t have the exact app for this town. Try one of these or search for it:',paySearch:'Search the app for {0}',payNote:'You pay inside the town\'s official app. HUECCO does not charge you or store payment data.',payUnk:'your town',zn_orange:'Orange zone',zs_free:'Free',zs_blue:'Blue',zs_green:'Green',zs_orange:'Orange',adaptedChip:'Accessible space (blue badge)',pmrOff:'Accessible',pmrOn:'Incl. accessible',pmrOnly:'Accessible only',pmrTag:'Accessible space (badge holders only)',themeAuto:'Auto',themeLight:'Light',themeDark:'Dark',evChip:'With EV charging point',evPill:'With charger',evTag:'Charging point',setT:'Settings',close:'Close',setApp:'App',setLang:'Language',setTheme:'Appearance',thAuto:'Like my phone',thLight:'Light',thDark:'Dark',setFilt:'Which spots I want to see',setVeh:'My vehicle',setPmr:'Accessible spaces (disabled badge)',pmrNo:'No',pmrIn:'Yes',pmrOnly2:'Only accessible',setFree:'Free spots only',setFreeS:'Hides blue, green and orange zones',setEv:'Only with a charging point',setNot:'Alerts',setRadius:'Count spots around me within',setAlert:'Alert me when a spot appears within',alOff:'Off',setVib:'Vibrate on an alert',setMore:'More',setNav:'Navigation app',navAsk:'Ask',setPayS:'Opens the town\'s official app',setIntro:'Show the intro again',setAbout:'Anonymous: no sign-up and no personal data stored.',setPayAfter:'Pay when I park',setPayAfterS:'Tapping «I parked» opens the town\'s official app',payAfterNote:'I saved where you parked. If it is a paid zone, pay now:',payNo2:'Free zone · no need to pay',tagline:'Park without circling',lyParkS:'Covered or underground public car parks. They do not show if there is room',lyPmrS:'Accessible spaces marked on the map. They do not show if free',pmrHint:'No: you do not see accessible spaces. Yes: you see them with the others. Only accessible: you see just those.',oneW:'free spot',manyW:'free spots',pmrShort:'Accessible space',relT:'Reliability',relHi:'Very reliable',relMid:'Reliable',relLow:'May have changed',setLay:'More on the map',lyEv:'Charging points',lyPark:'Car parks',lyPmr:'Fixed accessible spaces',lyS:'Public chargers near you, besides the ones neighbours report',poiEv:'Charging point',poiPark:'Public car park',poiPmr:'Accessible space',poiPts:'{0} points',poiSpots:'{0} spaces',poiFee:'Paid',poiFree:'Free',poiSrc:'OpenStreetMap data: may be out of date. It does not show if a space is free.',autoPark:'Did you park here?',autoParkYes:'Yes, I parked',autoNo:'No',autoGo:'Leaving? Tell neighbours about your spot',autoGoYes:'Report',setAuto:'Automatic detection (beta)',setAutoS:'Asks if you parked or are leaving. Works with the app open',setPriv:'Privacy',privTxt:'No sign-up. Your location is used on your phone to show nearby spots and, when you report, it is sent rounded (about 10 m) with a random device ID, with no name or email. Reports are shown for 12 hours. Informational text: pending legal review.'},
+    es:{loading:'Cargando…',one:'{0} hueco libre',many:'{0} huecos libres',near:'{0} a menos de {1} m de ti',zone:'a menos de {0} km',none:'Todo tranquilo',noneSub:'Sé el primero en avisar',
+      gps:'Sin ubicación: al avisar, tocarás el mapa para marcar dónde estás',nearest:'Más cercano: {0} · {1}',tap:'Toca un punto verde para ver el hueco',empty:'Cuando alguien se vaya, verás aquí su hueco',
+      now:'ahora mismo',ago:'hace {0} min',srv:'Sin conexión con el servidor ({0})',fresh:'¡Hueco libre a {0}!',undo:'Deshacer',
+      cardT:'Hueco libre',mine:'(tuyo)',conf:'{0} confirmaciones',go:'Ir',still:'Sigue libre',gone:'Ya no está',thanks:'Gracias',del:'Quitar mi aviso',
+      wait:'Espera un momento antes de volver a avisar.',pick:'Toca el mapa donde estás ahora mismo.',seeMore:'Veo otro hueco',howmany:'¿Cuántos huecos ves?',howmanyGo:'¿Qué hueco dejas?',sizeQ:'Tamaño (opcional)',z_moto:'Moto',z_car:'Coche',z_small:'Pequeño',z_medium:'Mediano',z_large:'Grande',send:'Enviar',spotsN:'{0} huecos',nogps:'No veo tu ubicación. Actívala en Ajustes › Safari › Ubicación.',dup:'Ese hueco ya estaba avisado. Lo he confirmado, ¡gracias!',
+      sentSee:'¡Hecho! Acabas de ahorrarle vueltas a alguien',sentGo:'¡Hecho! Alguien aparcará gracias a ti',parked:'Anotado. Si había un hueco aquí, ya no sale.',fail:'No se pudo enviar ({0}).',
+      bGo:'Me voy',bGoS:'dejo mi hueco',bPk:'He aparcado',bPkS:'ocupo un hueco',bSee:'Veo un hueco',bSeeS:'a pie',
+      o1t:'Encuentra sitio sin dar vueltas',o1:'Verás en un mapa los huecos que los vecinos acaban de dejar libres.',
+      o2t:'Tres toques',o2:'Me voy · He aparcado · Veo un hueco. Sin registro y anónimo.',
+      o3t:'Ayúdanos a empezar',o3:'Cuando salgas o aparques, pulsa el botón. Cada aviso ayuda a un vecino. Permite la ubicación cuando te la pida.',tip:'Consejo: Compartir › Añadir a pantalla de inicio',next:'Siguiente',start:'Empezar',
+      closer:'Hueco nuevo a {0}, más cerca que tu destino ({1})',ask:'¿Estás en el hueco? ¿Sigue libre?',ghost:'Aquí había un hueco. ¿Sigue ahí?',thx2:'¡Gracias! Hueco reactivado',dirQ:'Calle (opcional)',d_two:'Doble sentido',d_one:'Sentido único',zoneQ:'Zona de aparcamiento (opcional)',zn_free:'Libre',zn_blue:'Zona azul',zn_green:'Zona verde',
+      freeOnly:'Solo gratis',veh:'Vehículo',vehAll:'Todos',carT:'Mi coche',carSub:'aparcado hace {0}',carForget:'Olvidar',carSaved:' He guardado dónde está tu coche.',payTag:'de pago',payBtn:'Pagar zona azul',payT:'Pagar la zona azul',payIn:'en {0}',payOpen:'Abrir la app oficial',payWeb:'Web del operador',payOther:'Otras apps habituales',payNone:'No tenemos la app exacta de este municipio. Prueba una de estas o búscala:',paySearch:'Buscar la app de {0}',payNote:'Pagas dentro de la app oficial del municipio. HUECCO no cobra ni guarda datos de pago.',payUnk:'tu municipio',zn_orange:'Zona naranja',zs_free:'Libre',zs_blue:'Azul',zs_green:'Verde',zs_orange:'Naranja',adaptedChip:'Plaza adaptada (PMR)',pmrOff:'Adaptadas',pmrOn:'Con adaptadas',pmrOnly:'Solo adaptadas',pmrTag:'Plaza adaptada (solo con tarjeta PMR)',themeAuto:'Auto',themeLight:'Claro',themeDark:'Oscuro',evChip:'Con punto de carga eléctrica',evPill:'Con carga',evTag:'Punto de carga',setT:'Ajustes',close:'Cerrar',setApp:'Aplicación',setLang:'Idioma',setTheme:'Aspecto',thAuto:'Como el móvil',thLight:'Claro',thDark:'Oscuro',setFilt:'Qué huecos quiero ver',setVeh:'Mi vehículo',setPmr:'Plazas adaptadas (PMR)',pmrNo:'No',pmrIn:'Sí',pmrOnly2:'Solo adaptadas',setFree:'Solo huecos gratis',setFreeS:'Oculta zona azul, verde y naranja',setEv:'Solo con punto de carga',setNot:'Avisos',setRadius:'Cuento los huecos a mi alrededor de',setAlert:'Avísame cuando salga un hueco a',alOff:'No avisar',setVib:'Vibración en un aviso',setMore:'Más',setNav:'App de navegación',navAsk:'Preguntar',setPayS:'Abre la app oficial del municipio',setIntro:'Ver la introducción',setAbout:'Anónimo: no pedimos registro ni guardamos datos personales.',setPayAfter:'Pagar al aparcar',setPayAfterS:'Al pulsar «He aparcado» se abre la app oficial del municipio',payAfterNote:'He guardado dónde has aparcado. Si es zona de pago, paga ahora:',payNo2:'Zona gratuita · no hace falta pagar',tagline:'Aparca sin dar vueltas',lyParkS:'Parkings públicos cubiertos o subterráneos. No dicen si hay sitio libre',lyPmrS:'Plazas PMR marcadas en el mapa. No dicen si están libres',pmrHint:'No: no ves las plazas adaptadas. Sí: las ves junto a las demás. Solo adaptadas: solo ves esas.',oneW:'hueco libre',manyW:'huecos libres',pmrShort:'Plaza adaptada',relT:'Fiabilidad',relHi:'Muy fiable',relMid:'Fiable',relLow:'Puede haber cambiado',setLay:'Más cosas en el mapa',lyEv:'Puntos de carga',lyPark:'Parkings',lyPmr:'Plazas adaptadas fijas',lyS:'Cargadores públicos cerca de ti, además de los que avisan los vecinos',poiEv:'Punto de carga',poiPark:'Parking público',poiPmr:'Plaza PMR',poiPts:'{0} puntos',poiSpots:'{0} plazas',poiFee:'De pago',poiFree:'Gratuito',poiSrc:'Datos de OpenStreetMap: pueden no estar al día. No indica si hay sitio libre.',autoPark:'¿Has aparcado aquí?',autoParkYes:'Sí, he aparcado',autoNo:'No',autoGo:'¿Te vas? Avisa tu hueco a los vecinos',autoGoYes:'Avisar',setAuto:'Detección automática (beta)',setAutoS:'Te pregunta si has aparcado o te vas. Funciona con la app abierta',setPriv:'Privacidad',privTxt:'No hace falta registro. Tu ubicación solo se usa en el móvil para mostrarte los huecos cercanos y, cuando avisas, se envía redondeada (unos 10 m) con un identificador aleatorio del dispositivo, sin nombre ni correo. Los avisos se muestran durante 12 horas. Texto informativo: pendiente de revisión legal.'}
+  };
+  function tr(k,args){ var s=(TX[LANG]&&TX[LANG][k])||TX.es[k]||k; if(args) for(var i=0;i<args.length;i++) s=s.replace('{'+i+'}',args[i]); return s; }
+
+  var DEVICE = lsGet('plazas-device');
+  if(!DEVICE){ DEVICE = uuid(); lsSet('plazas-device',DEVICE); }
+
+  var S = { evOnly:lsGet('hueco-ev')==='1', pmr:lsGet('hueco-pmr')||'', dest:null, nudged:{}, carOpen:false, freeOnly:lsGet('hueco-free')==='1', veh:(function(){ var v=lsGet('hueco-veh')||''; return (v==='moto'||v==='car')?v:(v?'car':''); })(), pos:null, reports:[], spots:[], streets:[], sel:null, voted:{}, seen:{}, firstLoad:false, notice:null, last:{}, centered:false, error:'', sheet:null };
+  var map=null, markers={}, meMarker=null, toastTimer=null;
+
+  /* ---------- geometría ---------- */
+  function metersFrom(lat0,lon0,lat,lon){
+    return [(lon-lon0)*111320*Math.cos(lat0*Math.PI/180), (lat-lat0)*110540];
+  }
+  function segDist(p,a,b){
+    var vx=b[0]-a[0], vy=b[1]-a[1], l2=vx*vx+vy*vy, t=l2?((p[0]-a[0])*vx+(p[1]-a[1])*vy)/l2:0;
+    t=Math.max(0,Math.min(1,t));
+    var dx=p[0]-(a[0]+vx*t), dy=p[1]-(a[1]+vy*t);
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+
+  function distPt(a,b){ var m=metersFrom(a[0],a[1],b[0],b[1]); return Math.sqrt(m[0]*m[0]+m[1]*m[1]); }
+  function distLabel(d){ return d<1000?(Math.round(d/10)*10)+' m':(d/1000).toFixed(1)+' km'; }
+  function agoText(ms){ var m=Math.floor((Date.now()-ms)/60000); return m<1?tr('now'):tr('ago',[m]); }
+  function streetAt(p){
+    var best=Infinity, hit=null;
+    S.streets.forEach(function(st){
+      st.segs.forEach(function(seg){
+        for(var i=1;i<seg.length;i++){
+          var a=metersFrom(p[0],p[1],seg[i-1][0],seg[i-1][1]), b=metersFrom(p[0],p[1],seg[i][0],seg[i][1]);
+          var d=segDist([0,0],a,b); if(d<best){ best=d; hit=st; }
+        }
+      });
+    });
+    return (hit&&best<60)?hit:null;
+  }
+  function streetNameAt(p){ var h=streetAt(p); return h?h.name:''; }
+  /* ---------- calles reales (OpenStreetMap) ---------- */
+  function buildStreets(osm){
+    var by={};
+    (osm.elements||[]).forEach(function(w){
+      if(w.type!=='way'||!w.geometry||!w.tags||!w.tags.name) return;
+      var pts=w.geometry.map(function(g){ return [round5(g.lat),round5(g.lon)]; });
+      if(pts.length<2) return;
+      var k=norm(w.tags.name);
+      var s=by[k]||(by[k]={key:k,name:w.tags.name,segs:[],ow:0});
+      s.segs.push(pts);
+      if(w.tags.oneway==='yes'||w.tags.oneway==='-1'||w.tags.oneway==='true'||w.tags.oneway==='1') s.ow=1;
+    });
+    return Object.keys(by).map(function(k){ return by[k]; });
+  }
+  function fetchTile(b,i,errs,kind){
+    if(i>=ENDPOINTS.length) return Promise.reject(new Error(errs.join(' · ')||'sin respuesta'));
+    var bb=b.join(',');
+    var q=(kind==='poi')?('[out:json][timeout:25];(nwr["amenity"="charging_station"]('+bb+');nwr["amenity"="parking"]["parking"~"^(multi-storey|underground)$"]('+bb+');nwr["amenity"="parking_space"]["parking_space"="disabled"]('+bb+');nwr["amenity"="parking"]["capacity:disabled"]('+bb+'););out center tags;'):'[out:json][timeout:25];way["highway"~"^(primary|secondary|tertiary|residential|unclassified|living_street)$"]["name"]('+b.join(',')+');out geom;';
+    var ctl=(typeof AbortController!=='undefined')?new AbortController():null;
+    var timer=ctl?setTimeout(function(){ ctl.abort(); },20000):null;
+    var host=ENDPOINTS[i].split('/')[2];
+    var opts={};
+    if(ctl) opts.signal=ctl.signal;
+    // GET sencillo: evita problemas de CORS/preflight en Safari
+    return fetch(ENDPOINTS[i]+'?data='+encodeURIComponent(q),opts)
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(j){ if(timer) clearTimeout(timer); if(!j||!j.elements) throw new Error('sin datos'); return j.elements; })
+      .catch(function(e){ if(timer) clearTimeout(timer); errs.push(host+': '+(e&&e.name==='AbortError'?'tardó demasiado':(e&&e.message)||'error')); return fetchTile(b,i+1,errs,kind); });
+  }
+  /* capas del mapa con datos abiertos de OpenStreetMap */
+  var LAY={ev:lsGet('hueco-ly-ev')!=='0',park:lsGet('hueco-ly-pk')!=='0',pmr:lsGet('hueco-ly-pm')==='1'};
+  var S_POI={}, poiBusy={}, poiFail={}, poiMarkers={};
+  function buildPoi(els){
+    var out=[];
+    (els||[]).forEach(function(e){
+      var t=e.tags||{}, la=(e.lat!==undefined)?e.lat:(e.center&&e.center.lat), ln=(e.lon!==undefined)?e.lon:(e.center&&e.center.lon);
+      if(typeof la!=='number'||typeof ln!=='number') return;
+      var k=null;
+      if(t.amenity==='charging_station') k='ev';
+      else if(t.amenity==='parking'&&(t.parking==='multi-storey'||t.parking==='underground')) k='park';
+      else if(t.amenity==='parking_space'||t['capacity:disabled']) k='pmr';
+      if(!k) return;
+      out.push({k:k,lat:round5(la),lng:round5(ln),name:t.name||t.operator||t.brand||'',op:t.operator||'',fee:t.fee||'',cap:t.capacity||'',capd:t['capacity:disabled']||'',soc:t.capacity||''});
+    });
+    return out;
+  }
+  function loadPoiCell(k){
+    if(S_POI[k]||poiBusy[k]) return;
+    if(poiFail[k]&&Date.now()-poiFail[k]<60000) return;
+    poiBusy[k]=true;
+    fetchTile(cellBox(k),0,[],'poi').then(function(els){ S_POI[k]=buildPoi(els); if(map) renderMap(); })
+      .catch(function(){ poiFail[k]=Date.now(); }).then(function(){ delete poiBusy[k]; });
+  }
+  function ensurePoi(p){
+    if(!p||!(LAY.ev||LAY.park||LAY.pmr)) return;
+    var a=p[0]/CELL, b=p[1]/CELL, ia=Math.floor(a), ib=Math.floor(b), fa=a-ia, fb=b-ib, E=0.2;
+    loadPoiCell(ia+'_'+ib);
+    if(fa<E) loadPoiCell((ia-1)+'_'+ib); if(fa>1-E) loadPoiCell((ia+1)+'_'+ib);
+    if(fb<E) loadPoiCell(ia+'_'+(ib-1)); if(fb>1-E) loadPoiCell(ia+'_'+(ib+1));
+  }
+  function visiblePoi(){
+    var out=[], mc=map&&map.getCenter?map.getCenter():null; if(!mc||map.getZoom()<14) return out;
+    Object.keys(S_POI).forEach(function(k){ S_POI[k].forEach(function(o){
+      if(!LAY[o.k==='park'?'park':o.k]) return;
+      if(Math.abs(o.lat-mc[0])>0.012||Math.abs(o.lng-mc[1])>0.016) return;
+      out.push(o);
+    }); });
+    return out.slice(0,160);
+  }
+  function poiHtml(o){
+    return '<div class="poi k-'+o.k+'">'+(o.k==='ev'?IC.charge:(o.k==='park'?IC.park:IC.access))+'</div>';
+  }
+  /* calles de OpenStreetMap por cuadrículas: se cargan donde estás (o donde miras), en cualquier ciudad */
+  var CELL=0.02, CELL_IDX='hueco-cells', CELL_PFX='hueco-c3-', cellBusy={}, cellFail={};
+  var S_CELLS={};
+  function round5(x){ return Math.round(x*100000)/100000; }
+  function cellKey(la,ln){ return Math.floor(la/CELL)+'_'+Math.floor(ln/CELL); }
+  function cellBox(k){ var q=k.split('_'), la=+q[0]*CELL, ln=+q[1]*CELL; return [round5(la),round5(ln),round5(la+CELL),round5(ln+CELL)]; }
+  function rebuildStreets(){ var all=[]; Object.keys(S_CELLS).forEach(function(k){ all=all.concat(S_CELLS[k]); }); S.streets=all; }
+  function cellSave(k,d){
+    try{
+      var idx=JSON.parse(lsGet(CELL_IDX)||'[]').filter(function(x){ return x!==k; }); idx.push(k);
+      while(idx.length>6){ var o=idx.shift(); try{ localStorage.removeItem(CELL_PFX+o); }catch(e){} }
+      localStorage.setItem(CELL_PFX+k,JSON.stringify(d)); lsSet(CELL_IDX,JSON.stringify(idx));
+    }catch(e){ /* sin sitio en el móvil: queda en memoria y ya está */ }
+  }
+  function loadCell(k){
+    if(S_CELLS[k]||cellBusy[k]) return;
+    if(cellFail[k]&&Date.now()-cellFail[k]<60000) return;
+    var c=lsGet(CELL_PFX+k);
+    if(c){ try{ var d0=JSON.parse(c); if(d0&&d0.length){ S_CELLS[k]=d0; rebuildStreets(); return; } }catch(e){} }
+    cellBusy[k]=true;
+    fetchTile(cellBox(k),0,[]).then(function(els){ var d=buildStreets({elements:els}); S_CELLS[k]=d; if(d.length) cellSave(k,d); rebuildStreets(); })
+      .catch(function(){ cellFail[k]=Date.now(); }).then(function(){ delete cellBusy[k]; });
+  }
+  function ensureStreets(p){
+    if(!p) return;
+    var a=p[0]/CELL, b=p[1]/CELL, ia=Math.floor(a), ib=Math.floor(b), fa=a-ia, fb=b-ib, E=0.15;
+    loadCell(ia+'_'+ib);
+    if(fa<E) loadCell((ia-1)+'_'+ib); if(fa>1-E) loadCell((ia+1)+'_'+ib);
+    if(fb<E) loadCell(ia+'_'+(ib-1)); if(fb>1-E) loadCell(ia+'_'+(ib+1));
+  }
+
+  /* ---------- servidor de avisos (Supabase) o modo demo ---------- */
+  function api(path,opt){
+    opt=opt||{};
+    var h={apikey:CFG.SUPABASE_ANON_KEY,'Content-Type':'application/json'};
+    if(/^eyJ/.test(CFG.SUPABASE_ANON_KEY)) h.Authorization='Bearer '+CFG.SUPABASE_ANON_KEY;
+    return fetch(CFG.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/'+path,{method:opt.method||'GET',headers:h,body:opt.body?JSON.stringify(opt.body):undefined})
+      .then(function(r){
+        if(!r.ok&&r.status!==409) return r.text().then(function(t){ throw new Error('HTTP '+r.status+(t?' '+t.slice(0,80):'')); });
+        return r.text().then(function(t){ return t?JSON.parse(t):null; });
+      });
+  }
+  var backend;
+  if(REMOTE){
+    backend={
+      list:function(){
+        var since=new Date(Date.now()-60*60000).toISOString();
+        return api('reports_public?select=*&order=created_at.desc&limit=500&created_at=gte.'+encodeURIComponent(since));
+      },
+      add:function(r){
+        var base={id:r.id,street:r.street,street_name:r.street_name,event:r.event,eta_min:0,device:DEVICE,lat:r.lat,lng:r.lng};
+        var mid={}, ext={}; for(var k in base){ mid[k]=base[k]; ext[k]=base[k]; }
+        var hasMid=false, hasExt=false;
+        if(r.spots>1){ mid.spots=r.spots; ext.spots=r.spots; hasMid=true; }
+        if(r.size){ mid.size=r.size; ext.size=r.size; hasMid=true; }
+        if(r.zone){ ext.zone=r.zone; hasExt=true; }
+        if(r.dir){ ext.dir=r.dir; hasExt=true; }
+        if(r.ev) ext.ev=true;
+        if(r.adapted||r.ev){ if(r.adapted) ext.adapted=true; return api('reports',{method:'POST',body:ext}); } // una plaza adaptada nunca se guarda como normal
+        // si el servidor aún no tiene las columnas nuevas, reintenta con menos campos
+        var tryBase=function(){ return api('reports',{method:'POST',body:base}); };
+        var tryMid=function(){ return hasMid?api('reports',{method:'POST',body:mid}).catch(tryBase):tryBase(); };
+        return hasExt?api('reports',{method:'POST',body:ext}).catch(tryMid):tryMid();
+      },
+      vote:function(id,v){ return api('votes',{method:'POST',body:{report_id:id,device:DEVICE,vote:v}}); },
+      cancel:function(id){ return api('rpc/cancel_report',{method:'POST',body:{p_id:id,p_device:DEVICE}}); }
+    };
+  }else{
+    var local=function(){ try{ return JSON.parse(lsGet('hueco-demo')||'[]'); }catch(e){ return []; } };
+    var save=function(a){ lsSet('hueco-demo',JSON.stringify(a.slice(-100))); };
+    backend={
+      list:function(){ return Promise.resolve(local().filter(function(r){ return !r.cancelled; })); },
+      add:function(r){ var a=local(); a.push({adapted:!!r.adapted,ev:!!r.ev,spots:r.spots||1,size:r.size||'',zone:r.zone||'',dir:r.dir||'',id:r.id,street:r.street,street_name:r.street_name,event:r.event,lat:r.lat,lng:r.lng,created_at:new Date().toISOString(),confirms:0,denies:0}); save(a); return Promise.resolve(); },
+      vote:function(id,v){ var a=local(); a.forEach(function(r){ if(r.id===id){ if(v>0) r.confirms++; else r.denies++; } }); save(a); return Promise.resolve(); },
+      cancel:function(id){ var a=local(); a.forEach(function(r){ if(r.id===id) r.cancelled=true; }); save(a); return Promise.resolve(); }
+    };
+  }
+  function seedDemo(){
+    var a=[]; try{ a=JSON.parse(lsGet('hueco-demo')||'[]'); }catch(e){}
+    var c=[(B[0]+B[2])/2,(B[1]+B[3])/2];
+    var base=S.pos||c, n=a.filter(function(r){ return r.demo&&Date.now()-Date.parse(r.created_at)<TTL; }).length;
+    for(var i=n;i<4;i++){
+      a.push({id:uuid(),street:'zona',street_name:'Hueco de prueba',event:'leaving',demo:true,
+        lat:base[0]+(Math.random()-.5)*0.004,lng:base[1]+(Math.random()-.5)*0.006,
+        created_at:new Date(Date.now()-Math.floor(Math.random()*6)*60000).toISOString(),confirms:Math.floor(Math.random()*3),denies:0});
+    }
+    lsSet('hueco-demo',JSON.stringify(a.slice(-100)));
+  }
+
+  /* ---------- huecos activos ---------- */
+  function normReport(r){
+    return {id:r.id,event:r.event,name:r.street_name,lat:r.lat,lng:r.lng,t:Date.parse(r.created_at),conf:r.confirms||0,deny:r.denies||0,n:Math.max(1,Math.min(20,r.spots||1)),size:r.size||'',zone:r.zone||'',dir:r.dir||'',adapted:!!r.adapted,ev:!!r.ev};
+  }
+  function computeSpots(){
+    var now=Date.now(), rs=S.reports.filter(function(r){ return typeof r.lat==='number'&&typeof r.lng==='number'&&now-r.t<=ttlOf(r); });
+    var parked=rs.filter(function(r){ return r.event==='parked'; });
+    S.spots=rs.filter(function(r){
+      if(r.event!=='leaving') return false;
+      if((1+r.conf-1.5*r.deny)<=0) return false;
+      var taken=parked.filter(function(p){ return p.t>r.t && distPt([p.lat,p.lng],[r.lat,r.lng])<=MERGE_M; }).length;
+      r.left=Math.max(0,(r.n||1)-taken);
+      return r.left>0;
+    }).map(function(r){
+      r.d=S.pos?distPt(S.pos,[r.lat,r.lng]):null;
+      var ref=refPoint(); r.dz=ref?distPt(ref,[r.lat,r.lng]):0;
+      r.mine=MINE.indexOf(r.id)>=0;
+      var ageF=Math.min(1,(now-r.t)/ttlOf(r)); r.score=Math.max(5,Math.min(99,Math.round(58+Math.min(r.conf,4)*10-r.deny*25-ageF*35)));
+      return r;
+    }).filter(function(r){
+      if(S.freeOnly&&isPaid(r.zone)) return false;
+      if(S.evOnly&&!r.ev) return false;
+      if(r.adapted){ if(!S.pmr) return false; } else if(S.pmr==='only') return false;
+      if(S.veh==='car'&&r.size==='moto') return false; // un coche no cabe en un hueco de moto; una moto cabe en cualquiera
+      return true;
+    }).sort(function(a,b){ return (a.d!==null&&b.d!==null)?a.d-b.d:b.t-a.t; });
+    // huecos caducados (más de 15 min, menos de 3 h) que nadie ha ocupado: «¿sigue ahí?»
+    var old=S.reports.filter(function(r){ return typeof r.lat==='number'&&typeof r.lng==='number'&&r.event==='leaving'&&now-r.t>ttlOf(r)&&now-r.t<=GHOST&&(1+r.conf-1.5*r.deny)>0; });
+    S.ghosts=old.filter(function(r){
+      var pt=[r.lat,r.lng];
+      var later=S.reports.some(function(x){ return x.id!==r.id&&x.t>r.t&&typeof x.lat==='number'&&distPt([x.lat,x.lng],pt)<=MERGE_M&&(x.event==='parked'||x.event==='leaving'); });
+      return !later;
+    }).map(function(r){ r.d=S.pos?distPt(S.pos,[r.lat,r.lng]):null; return r; });
+    // si el destino elegido ya no existe, se olvida
+    if(S.dest&&!S.spots.some(function(x){ return x.id===S.dest.id; })&&Date.now()-S.dest.t>20000) S.dest=null;
+  }
+  // punto de referencia de «tu zona»: tu ubicación; sin ella, el centro del mapa
+  function refPoint(){
+    if(S.pos) return S.pos;
+    if(map&&map.getCenter){ var c=map.getCenter(); if(c) return c; }
+    return null;
+  }
+  function refresh(){
+    return backend.list().then(function(rows){
+      S.reports=(rows||[]).map(normReport); S.error='';
+      computeSpots(); checkNew();
+    }).catch(function(e){ S.error=tr('srv',[e.message]); });
+  }
+  // color del aviso: verde = libre, azul / verde oscuro / naranja = de pago, violeta = adaptada
+  var IC={"charge": "<svg class=\"ic24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"3\" y=\"7.5\" width=\"16\" height=\"9.5\" rx=\"2.6\"/><path d=\"M21.5 10.8v2.4\"/><path d=\"M11.8 9.6L9.2 12.8h3l-1 2.8 3.4-3.8h-3z\"/></svg>", "access": "<svg class=\"ic24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"4.4\" r=\"1.8\"/><path d=\"M11 8v6h5l2.5 5.5M11 11h5\"/><path d=\"M8.4 11.6a5 5 0 1 0 6.2 7.4\"/></svg>", "park": "<svg class=\"ic24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"5\"/><path d=\"M10 16.5V8h3.2a2.6 2.6 0 0 1 0 5.2H10\"/></svg>", "leave": "<svg class=\"ic24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 12h12M12 6l6 6-6 6\"/></svg>", "eye": "<svg class=\"ic24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>"};
+  var LOGO='<svg viewBox="0 0 120 120" aria-hidden="true"><rect x="20" y="16" width="22" height="88" rx="4" fill="#fff"/><rect x="78" y="16" width="22" height="88" rx="4" fill="#fff"/><rect x="50" y="46" width="20" height="28" rx="4" fill="#D4FF3A"/></svg>';
+  var PMR_SVG=IC.access.replace('ic24','wc');
+  function toneOf(r){ return r.adapted?'pmr':(r.zone||'free'); }
+  function zoneSuffix(r){ return (r.adapted?' · PMR':(r.zone?' · '+tr('zs_'+r.zone):''))+(r.ev?' · '+tr('evTag'):''); }
+  function checkNew(){
+    var fresh=[];
+    S.spots.forEach(function(r){
+      if(S.seen[r.id]) return; S.seen[r.id]=true;
+      if(!S.firstLoad||r.mine) return;
+      if(ALERT_M>0&&S.pos&&r.d!==null&&r.d<=ALERT_M) fresh.push(r);
+    });
+    S.firstLoad=true;
+    if(fresh.length){
+      var f0=fresh[0], dd=S.dest&&S.pos?S.spots.filter(function(x){ return x.id===S.dest.id; })[0]:null;
+      if(dd&&dd.d!==null&&f0.d<dd.d-40){
+        // vas hacia un hueco y ha salido otro más cerca de ti
+        showToast(tr('closer',[distLabel(f0.d),distLabel(dd.d)])+zoneSuffix(f0),null,12000,'go:'+f0.id,toneOf(f0));
+      }else showToast(tr('fresh',[distLabel(f0.d)])+zoneSuffix(f0),null,7000,'go:'+f0.id,toneOf(f0));
+      try{ if(VIB&&navigator.vibrate) navigator.vibrate([250,120,250]); }catch(e){}
+    }
+  }
+
+  /* ---------- ubicación ---------- */
+  function startGPS(){
+    if(!navigator.geolocation||S.gpsOn) return; S.gpsOn=true;
+    navigator.geolocation.watchPosition(function(p){
+      S.pos=[p.coords.latitude,p.coords.longitude]; S.acc=p.coords.accuracy;
+      if(map&&!S.centered){ S.centered=true; map.setView(S.pos,17); }
+      autoDetect(p); ensureStreets(S.pos); ensurePoi(S.pos); computeSpots(); nudge(); render();
+    },function(){ S.gpsDenied=true; render(); },{enableHighAccuracy:true,maximumAge:5000,timeout:20000});
+  }
+  // si estás justo en un hueco ajeno, te pregunta si sigue libre (así los avisos se mantienen fiables)
+  function nudge(){
+    if(S.notice||S.sheet) return;
+    for(var i=0;i<S.spots.length;i++){
+      var r=S.spots[i];
+      if(r.mine||S.voted[r.id]||S.nudged[r.id]||r.d===null||r.d>25||Date.now()-r.t<90000) continue;
+      S.nudged[r.id]=true; showToast(tr('ask'),null,12000,'ask:'+r.id); return;
+    }
+    var g=S.ghosts||[];
+    for(var j=0;j<g.length;j++){
+      var q=g[j];
+      if(q.mine||MINE.indexOf(q.id)>=0||S.voted[q.id]||S.nudged[q.id]||q.d===null||q.d>GHOST_M) continue;
+      S.nudged[q.id]=true; showToast(tr('ghost'),null,12000,'ghost:'+q.id); return;
+    }
+  }
+  function needPos(cb){
+    if(S.pos) return cb(true);
+    navigator.geolocation&&navigator.geolocation.getCurrentPosition(function(p){
+      S.pos=[p.coords.latitude,p.coords.longitude]; cb(true);
+    },function(){ cb(false); },{enableHighAccuracy:true,timeout:12000});
+    if(!navigator.geolocation) cb(false);
+  }
+
+  /* ---------- mapa ---------- */
+  // Mapa vectorial moderno (MapLibre + OpenFreeMap, sin clave). Si no carga, vuelve al mapa clásico (Leaflet).
+  var STYLE_LIGHT='https://tiles.openfreemap.org/styles/bright', STYLE_DARK='';
+  var THEME=lsGet('hueco-theme')||'auto'; // auto = modo del móvil o de noche (21–7 h)
+  function wantDark(){ if(THEME==='dark') return true; if(THEME==='light') return false; return isDark(); }
+  function applyTheme(){
+    var d=wantDark();
+    document.documentElement.setAttribute('data-theme',d?'dark':'light');
+    var tc=$('tc'); if(tc) tc.setAttribute('content',d?'#0A0B0F':'#F5F6F8');
+    if(map&&map.setDark) map.setDark(d);
+  }
+  /* oscurece el estilo claro de OpenFreeMap capa a capa: tierra casi negra, calles claras, agua azul profundo */
+  function parseCol(v){
+    var s=String(v).trim(), m, r, g, b, a=1;
+    if((m=s.match(/^#([0-9a-f]{3,8})$/i))){ var x=m[1]; if(x.length<=4) x=x.split('').map(function(c){ return c+c; }).join(''); r=parseInt(x.substr(0,2),16); g=parseInt(x.substr(2,2),16); b=parseInt(x.substr(4,2),16); if(x.length===8) a=parseInt(x.substr(6,2),16)/255; }
+    else if((m=s.match(/^rgba?\(([^)]+)\)$/i))){ var q=m[1].split(','); r=+q[0]; g=+q[1]; b=+q[2]; if(q.length>3) a=+q[3]; }
+    else if((m=s.match(/^hsla?\(([^)]+)\)$/i))){ var w=m[1].split(','); return [+w[0],parseFloat(w[1])/100,parseFloat(w[2])/100,w.length>3?+w[3]:1]; }
+    else return null;
+    r/=255; g/=255; b/=255;
+    var mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2, h=0, sa=0;
+    if(mx!==mn){ var d=mx-mn; sa=l>.5?d/(2-mx-mn):d/(mx+mn); h=mx===r?((g-b)/d+(g<b?6:0)):(mx===g?(b-r)/d+2:(r-g)/d+4); h*=60; }
+    return [h,sa,l,a];
+  }
+  function darkCol(v){ var c=parseCol(v); if(!c) return v; return 'hsla('+Math.round(c[0])+','+Math.round(c[1]*45)+'%,'+Math.round((0.07+c[2]*0.2)*100)+'%,'+c[3]+')'; }
+  function mapCols(v,fn){
+    if(typeof v==='string') return /^\s*(#|rgb|hsl)/i.test(v)?fn(v):v;
+    if(Array.isArray(v)) return v.map(function(x){ return mapCols(x,fn); });
+    if(v&&typeof v==='object'&&v.stops) return {base:v.base,stops:v.stops.map(function(st){ return [st[0],mapCols(st[1],fn)]; })};
+    return v;
+  }
+  function darkenStyle(st){
+    var BG='#0F1117';
+    (st.layers||[]).forEach(function(ly){
+      var id=ly.id, t=ly.type, p=ly.paint=ly.paint||{}, set=function(k,v){ if(k in p) p[k]=v; }, c=null;
+      if(t==='background'){ p['background-color']=BG; return; }
+      if(t==='fill'||t==='fill-extrusion'){
+        if(id==='water'||id==='water-intermittent') c='#10193A';
+        else if(/^(park|landcover-(wood|grass|grass-park))/.test(id)) c='#141A18';
+        else if(/landcover-(sand|glacier|ice)/.test(id)) c='#171d25';
+        else if(id==='landuse-cemetery') c='#13201b';
+        else if(/landuse-(hospital|school)/.test(id)) c='#17202b';
+        else if(id==='landuse-industrial') c='#151b24';
+        else if(id==='landuse-commercial') c='#161d27';
+        else if(/^landuse/.test(id)) c='#121922';
+        else if(id==='building') c='#1B1E27';
+        else if(id==='building-top') c='#222a37';
+        else if(/area|pier/.test(id)) c='#1a212c';
+        if(c){ set('fill-color',c); set('fill-extrusion-color',c); set('fill-outline-color',/building/.test(id)?'#283040':c); }
+        else Object.keys(p).forEach(function(k){ if(/color/.test(k)) p[k]=mapCols(p[k],darkCol); });
+      }else if(t==='line'){
+        if(/waterway/.test(id)) c='#10344b';
+        else if(/hatching/.test(id)) c='#242c38';
+        else if(/casing/.test(id)) c='#0b0f14';
+        else if(/motorway/.test(id)) c='#62748c';
+        else if(/trunk|primary/.test(id)) c='#4b5a70';
+        else if(/secondary|tertiary/.test(id)) c='#3d495c';
+        else if(/minor|link|service/.test(id)) c='#303b4d';
+        else if(/path/.test(id)) c='#2b3442';
+        else if(/railway|transit/.test(id)) c='#2b3341';
+        else if(/boundary/.test(id)) c='#3a4558';
+        else if(/ferry|cablecar/.test(id)) c='#2d4d78';
+        else if(/aeroway/.test(id)) c='#303b4d';
+        if(c) set('line-color',c);
+        else Object.keys(p).forEach(function(k){ if(/color/.test(k)) p[k]=mapCols(p[k],darkCol); });
+      }else if(t==='symbol'){
+        var tc='#c8d2de', hc='#0F1117';
+        if(/^label_(city|country|state)/.test(id)) tc='#e8eef6';
+        else if(/water/.test(id)){ tc='#6f93b3'; hc='#10193A'; }
+        else if(/^highway-name/.test(id)) tc='#aebacb';
+        else if(/^poi|airport/.test(id)) tc='#8fa1b5';
+        p['text-color']=tc; p['text-halo-color']=hc;
+        if(!p['text-halo-width']) p['text-halo-width']=1;
+        if('icon-opacity' in p||/^poi/.test(id)) p['icon-opacity']=0.7;
+      }else if(t==='circle'||t==='heatmap'){
+        Object.keys(p).forEach(function(k){ if(/color/.test(k)) p[k]=mapCols(p[k],darkCol); });
+      }
+    });
+    return st;
+  }
+  var GL_LIGHT=null;
+  function loadLightJSON(){ if(GL_LIGHT) return Promise.resolve(GL_LIGHT); return fetch(STYLE_LIGHT).then(function(r){ return r.json(); }).then(function(j){ GL_LIGHT=j; return j; }); }
+  function isDark(){ try{ return !!(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches); }catch(e){ return false; } }
+  function webglOK(){ try{ var c=document.createElement('canvas'); return !!(window.WebGLRenderingContext&&(c.getContext('webgl2')||c.getContext('webgl'))); }catch(e){ return false; } }
+  function onMapTap(lat,lng){
+    if(S.pick){ var k=S.pick, kx=S.pickEx; S.pick=null; S.pos=[lat,lng]; S.manual=true; send(k,kx); return; }
+    S.sel=null; S.navFor=null; render();
+  }
+  function initGL(c){
+    var blank={version:8,sources:{},layers:[{id:'background',type:'background',paint:{'background-color':'#0F1117'}}]};
+    var gl=new maplibregl.Map({container:'map',style:wantDark()?blank:STYLE_LIGHT,center:[c[1],c[0]],zoom:15,
+      attributionControl:false,pitch:0,maxPitch:0,dragRotate:true,touchPitch:false});
+    gl.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-left');
+    var cp=document.getElementById('compass');
+    if(cp){
+      cp.style.display='flex';
+      var ci=cp.firstElementChild;
+      gl.on('rotate',function(){ ci.style.transform='rotate('+(-gl.getBearing())+'deg)'; });
+      cp.addEventListener('click',function(ev){ ev.stopPropagation(); gl.easeTo({bearing:0,duration:400}); });
+    }
+    gl.on('click',function(e){ onMapTap(e.lngLat.lat,e.lngLat.lng); });
+    function el(html,sz){ var d=document.createElement('div'); d.className='spotwrap'; d.style.width=sz+'px'; d.style.height=sz+'px'; d.innerHTML=html; return d; }
+    gl._dk=false;
+    return {
+      kind:'gl',
+      setDark:function(d){
+        if(gl._dk===d) return; gl._dk=d;
+        if(!d){ document.body.classList.remove('dusk'); gl.setStyle(STYLE_LIGHT); return; }
+        loadLightJSON().then(function(j){ if(gl._dk) gl.setStyle(darkenStyle(JSON.parse(JSON.stringify(j)))); })
+          .catch(function(){ gl.setStyle(STYLE_LIGHT); document.body.classList.add('dusk'); });
+      },
+      setView:function(ll,z){ gl.easeTo({center:[ll[1],ll[0]],zoom:Math.max(0,z-1),duration:600}); },
+      getZoom:function(){ return gl.getZoom()+1; },
+      getCenter:function(){ var c=gl.getCenter(); return [c.lat,c.lng]; },
+      onMove:function(cb){ gl.on('moveend',cb); },
+      fit:function(list){ var b=new maplibregl.LngLatBounds(); list.forEach(function(p){ b.extend([p[1],p[0]]); }); gl.fitBounds(b,{padding:70,maxZoom:16,duration:600}); },
+      addMarker:function(ll,html,sz,onClick){
+        var e=el(html,sz); if(onClick) e.addEventListener('click',function(ev){ ev.stopPropagation(); onClick(); });
+        var m=new maplibregl.Marker({element:e,anchor:'center'}).setLngLat([ll[1],ll[0]]).addTo(gl);
+        return {setHtml:function(h){ e.innerHTML=h; },remove:function(){ m.remove(); },setLatLng:function(p){ m.setLngLat([p[1],p[0]]); }};
+      }
+    };
+  }
+  function initLeaf(c){
+    var lm=L.map('map',{zoomControl:false,attributionControl:false}).setView(c,16);
+    L.control.attribution({prefix:false,position:'bottomleft'}).addTo(lm);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(lm);
+    lm.on('click',function(e){ onMapTap(e.latlng.lat,e.latlng.lng); });
+    return {
+      kind:'leaf',
+      setView:function(ll,z){ lm.setView(ll,z); },
+      getZoom:function(){ return lm.getZoom(); },
+      getCenter:function(){ var c=lm.getCenter(); return [c.lat,c.lng]; },
+      onMove:function(cb){ lm.on('moveend',cb); },
+      setDark:function(){},
+      fit:function(list){ lm.fitBounds(L.latLngBounds(list),{padding:[70,70],maxZoom:17}); },
+      addMarker:function(ll,html,sz,onClick){
+        var ic=L.divIcon({className:'spotwrap',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],html:html});
+        var m=L.marker(ll,{icon:ic,keyboard:false,zIndexOffset:sz>30?500:1000,interactive:!!onClick}).addTo(lm);
+        if(onClick) m.on('click',function(e){ L.DomEvent.stopPropagation(e); onClick(); });
+        return {setHtml:function(h){ m.setIcon(L.divIcon({className:'spotwrap',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],html:h})); },remove:function(){ lm.removeLayer(m); },setLatLng:function(p){ m.setLatLng(p); }};
+      }
+    };
+  }
+  function initMap(){
+    var c=[(B[0]+B[2])/2,(B[1]+B[3])/2];
+    map=null;
+    if(window.maplibregl&&webglOK()){ try{ map=initGL(c); }catch(e){ map=null; } }
+    if(!map) map=initLeaf(c);
+    applyTheme(); try{ var mq=matchMedia('(prefers-color-scheme: dark)'); if(mq.addEventListener) mq.addEventListener('change',applyTheme); }catch(e){}
+    var mt=null; map.onMove(function(){ clearTimeout(mt); mt=setTimeout(function(){ if(!S.pos) computeSpots(); render(); var c2=map.getCenter(); if(map.getZoom()>=14){ ensureStreets([c2[0],c2[1]]); ensurePoi([c2[0],c2[1]]); } },250); });
+  }
+  function spotHtml(r,sel){
+    var m=Math.floor((Date.now()-r.t)/60000), z=r.zone==='blue'?'zb':(r.zone==='green'?'zg':(r.zone==='orange'?'zo':'zf'));
+    var bd=(r.adapted?'<u class="bd">'+IC.access+'</u>':(r.ev?'<u class="bd">'+IC.charge+'</u>':''));
+    var bd2=(r.adapted&&r.ev)?'<u class="bd bd2">'+IC.charge+'</u>':'';
+    return '<div class="pt '+z+(sel?' sel':'')+(m>=10?' old':'')+'"><i></i>'+bd+bd2+(r.left>1?'<em class="cnt">'+r.left+'</em>':'')+'</div>';
+  }
+  function renderMap(){
+    if(!map) return;
+    var ids={}, mc=map.getCenter?map.getCenter():null;
+    S.spots.forEach(function(r){
+      if(mc&&distPt(mc,[r.lat,r.lng])>MAP_M) return; // solo se dibujan los huecos de la zona que miras
+      ids[r.id]=1; var sel=S.sel===r.id, m=Math.floor((Date.now()-r.t)/60000), sig=m+'|'+sel+'|'+r.left+'|'+r.zone+'|'+(r.adapted?1:0)+'|'+(r.ev?1:0);
+      if(!markers[r.id]){
+        (function(id){ markers[id]=map.addMarker([r.lat,r.lng],spotHtml(r,sel),48,function(){ S.sel=id; render(); }); })(r.id);
+        markers[r.id]._sig=sig;
+      }else if(markers[r.id]._sig!==sig){ markers[r.id].setHtml(spotHtml(r,sel)); markers[r.id]._sig=sig; }
+    });
+    Object.keys(markers).forEach(function(id){ if(!ids[id]){ markers[id].remove(); delete markers[id]; } });
+    var pv=visiblePoi(), pids={};
+    pv.forEach(function(o){
+      var key=o.k+'|'+o.lat+'|'+o.lng; pids[key]=1;
+      if(!poiMarkers[key]) (function(oo,kk){ poiMarkers[kk]=map.addMarker([oo.lat,oo.lng],poiHtml(oo),40,function(){ S.poiSel=oo; S.sel=null; S.payOpen=false; S.carOpen=false; render(); }); })(o,key);
+    });
+    Object.keys(poiMarkers).forEach(function(k){ if(!pids[k]){ poiMarkers[k].remove(); delete poiMarkers[k]; } });
+    if(S.pos){
+      if(!meMarker) meMarker=map.addMarker(S.pos,'<div class="me"></div>',20,null);
+      else meMarker.setLatLng(S.pos);
+    }
+  }
+
+  /* ---------- pantalla ---------- */
+  function showToast(text,undoId,ms,act,tone){
+    S.notice={text:text,undo:undoId||null,act:act||null,tone:tone||''};
+    clearTimeout(toastTimer); toastTimer=setTimeout(function(){ S.notice=null; render(); },ms||7000);
+    render();
+  }
+  /* ---------- zona blava: app oficial de cada municipio ---------- */
+  var IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var APPS={
+    elparking:{n:'ElParking',ios:'https://apps.apple.com/es/app/id1120207710',and:'https://play.google.com/store/search?q=ElParking&c=apps'},
+    smou:{n:'SMOU',ios:'https://apps.apple.com/es/app/smou-servicios-de-movilidad/id1439898721',and:'https://play.google.com/store/search?q=SMOU%20Barcelona&c=apps'},
+    aparcar:{n:'Aparcar App',ios:'https://apps.apple.com/es/app/aparcar-app/id1014424127',and:'https://play.google.com/store/search?q=Aparcar%20App&c=apps'},
+    blinkay:{n:'Blinkay',ios:'https://apps.apple.com/es/app/iparkme/id958170386',and:'https://play.google.com/store/search?q=Blinkay&c=apps'}
+  };
+  // [nombre, lat, lng, radio km, app, web del operador, confirmado]
+  var TOWNS=[
+    ['Barcelona',41.3874,2.1686,6.5,'smou','',1],
+    ['Badalona',41.4500,2.2474,3.5,'smou','https://elparking.com/en/park-in-badalona',1],
+    ['Montgat',41.4650,2.2790,1.3,'',''],
+    ['El Masnou',41.4780,2.3180,1.8,'blinkay','',1],
+    ['Premià de Mar',41.4900,2.3600,1.6,'',''],
+    ['Vilassar de Mar',41.5075,2.3910,1.5,'elparking','',0],
+    ['Cabrera de Mar',41.5290,2.3930,1.6,'elparking','https://elparking.com/aparcar-en-cabrera-de-mar',1],
+    ['Mataró',41.5400,2.4445,3.5,'elparking','https://elparking.com/en/park-in-mataro',1],
+    ['Arenys de Mar',41.5810,2.5510,1.8,'',''],
+    ['Canet de Mar',41.5900,2.5810,1.8,'',''],
+    ['Sant Pol de Mar',41.6020,2.6230,1.5,'',''],
+    ['Calella',41.6140,2.6630,2.0,'',''],
+    ['Pineda de Mar',41.6270,2.6900,2.2,'',''],
+    ['Malgrat de Mar',41.6450,2.7410,2.2,'',''],
+    ['Granollers',41.6080,2.2880,3.0,'elparking','',1],
+    ['Mollet del Vallès',41.5400,2.2130,2.8,'elparking','',1],
+    ['Girona',41.9794,2.8214,5.0,'aparcar','',1]
+  ];
+  function townAt(p){
+    if(!p) return null; var best=null,bs=1e9;
+    TOWNS.forEach(function(t){ var d=distPt(p,[t[1],t[2]])/1000/t[3]; if(d<=1&&d<bs){ bs=d; best=t; } });
+    return best;
+  }
+  function appLink(k){ var a=APPS[k]; return IOS?a.ios:a.and; }
+  function payCard(){
+    var ref=S.pos||(map&&map.getCenter&&map.getCenter())||null, tw=townAt(ref);
+    var nm=tw?tw[0]:(S.townName||tr('payUnk')), pa=S.payAfter;
+    var h='<div class="card"><button type="button" class="x" data-a="payx" aria-label="Cerrar">×</button><h2>'+tr('payT')+'</h2>';
+    h+='<div class="sub">'+esc(tr('payIn',[nm]))+'</div>'+(pa?'<div class="sub" style="margin-top:6px">'+esc(tr('payAfterNote'))+'</div>':'')+'<div class="acts">';
+    if(tw&&tw[4]){
+      h+='<a class="ir" target="_blank" rel="noopener" href="'+appLink(tw[4])+'">'+esc(tr('payOpen'))+' · '+APPS[tw[4]].n+'</a>';
+      if(tw[5]&&!pa) h+='<a target="_blank" rel="noopener" href="'+tw[5]+'">'+esc(tr('payWeb'))+'</a>';
+    }else{
+      h+='<a class="ir" target="_blank" rel="noopener" href="https://www.google.com/search?q='+encodeURIComponent('zona blava app pagar '+nm)+'">'+esc(tr('paySearch',[nm]))+'</a>';
+    }
+    h+='</div>';
+    if(pa) h+='<div class="acts"><button type="button" data-a="payx">'+esc(tr('payNo2'))+'</button></div>';
+    h+='<div class="sub" style="margin-top:12px">'+esc(tr(tw&&tw[4]?'payOther':'payNone'))+'</div><div class="acts">';
+    Object.keys(APPS).forEach(function(k){ if(!(tw&&tw[4]===k)) h+='<a target="_blank" rel="noopener" href="'+appLink(k)+'">'+APPS[k].n+'</a>'; });
+    return h+'</div><div class="sub" style="margin-top:10px;font-size:12px">'+esc(tr('payNote'))+'</div></div>';
+  }
+  function navApps(sp){
+    var ll=sp.lat+','+sp.lng;
+    return [['apple','Apple Maps','https://maps.apple.com/?daddr='+ll+'&dirflg=d'],
+              ['google','Google Maps','https://www.google.com/maps/dir/?api=1&travelmode=driving&destination='+ll],
+              ['waze','Waze','https://waze.com/ul?ll='+ll+'&navigate=yes']];
+  }
+  function poiCard(){
+    var o=S.poiSel, kt=o.k==='ev'?tr('poiEv'):(o.k==='park'?tr('poiPark'):tr('poiPmr'));
+    var tags='';
+    if(o.k==='ev'&&o.cap) tags+='<span>'+esc(tr('poiPts',[o.cap]))+'</span>';
+    if(o.k==='park'&&o.cap) tags+='<span>'+esc(tr('poiSpots',[o.cap]))+'</span>';
+    if(o.k==='park'&&o.fee) tags+='<span>'+esc(o.fee==='yes'?tr('poiFee'):(o.fee==='no'?tr('poiFree'):o.fee))+'</span>';
+    if(o.k==='pmr'&&o.capd) tags+='<span>'+esc(tr('poiSpots',[o.capd]))+'</span>';
+    if(o.op&&o.op!==o.name) tags+='<span>'+esc(o.op)+'</span>';
+    return '<div class="card"><button type="button" class="x" data-a="poix" aria-label="Cerrar">×</button><h2>'+esc(o.name||kt)+'</h2><div class="sub">'+esc(kt)+(S.pos?' · '+distLabel(distPt(S.pos,[o.lat,o.lng])):'')+'</div>'+(tags?'<div class="tags">'+tags+'</div>':'')+'<div class="sub" style="font-size:12px;margin-top:8px">'+esc(tr('poiSrc'))+'</div><div class="acts">'+navLinks(o)+'</div></div>';
+  }
+  function navLinks(sp){
+    var last=lsGet('hueco-nav')||'google', apps=navApps(sp);
+    return apps.map(function(a){ return '<a'+(a[0]===last?' class="ir"':'')+' data-a="navgo" data-app="'+a[0]+'" target="_blank" rel="noopener" href="'+a[2]+'">'+a[1]+'</a>'; }).join('');
+  }
+  function toastAct(act){
+    if(!act) return '';
+    if(act==='see') return '<button type="button" data-a="opensee">'+tr('seeMore')+'</button>';
+    if(act.indexOf('go:')===0) return '<button type="button" data-a="gonew" data-id="'+esc(act.slice(3))+'">'+tr('go')+'</button>';
+    if(act.indexOf('ghost:')===0){ var gid=esc(act.slice(6)); return '<button type="button" data-a="ghost" data-id="'+gid+'">'+tr('still')+'</button><button type="button" data-a="vote" data-id="'+gid+'" data-v="-1">'+tr('gone')+'</button>'; }
+    if(act==='autopark') return '<button type="button" data-a="apy">'+tr('autoParkYes')+'</button><button type="button" data-a="ano">'+tr('autoNo')+'</button>';
+    if(act==='autogo') return '<button type="button" data-a="agy">'+tr('autoGoYes')+'</button><button type="button" data-a="ano">'+tr('autoNo')+'</button>';
+    if(act.indexOf('ask:')===0){ var id=esc(act.slice(4)); return '<button type="button" data-a="vote" data-id="'+id+'" data-v="1">'+tr('still')+'</button><button type="button" data-a="vote" data-id="'+id+'" data-v="-1">'+tr('gone')+'</button>'; }
+    return '';
+  }
+  function getCar(){
+    try{ var c=JSON.parse(lsGet('hueco-car')||'null'); if(c&&Date.now()-c.t<48*3600000) return c; }catch(e){}
+    return null;
+  }
+  function durText(ms){ var m=Math.max(1,Math.floor(ms/60000)); return m<60?m+' min':Math.floor(m/60)+' h '+(m%60)+' min'; }
+  /* ---------- ajustes ---------- */
+  function seg(act,items,cur){ return '<div class="seg">'+items.map(function(it){ return '<button type="button" data-a="'+act+'" data-v="'+it.v+'"'+(String(cur)===String(it.v)?' class="on"':'')+'>'+esc(it.l)+'</button>'; }).join('')+'</div>'; }
+  function tog(act,on){ return '<button type="button" class="sw'+(on?' on':'')+'" data-a="'+act+'" role="switch" aria-checked="'+(on?'true':'false')+'"><i></i></button>'; }
+  function blk(label,ctrl){ return '<div class="sblock"><div class="sl">'+esc(label)+'</div>'+ctrl+'</div>'; }
+  function srow(label,ctrl,sub){ return '<div class="srow"><div class="sl">'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</div>'+ctrl+'</div>'; }
+  function btnrow(label,act,sub){ return '<button type="button" class="srow sbtn" data-a="'+act+'"><div class="sl">'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</div><span class="chev">›</span></button>'; }
+  function settingsHtml(){
+    var np=lsGet('hueco-navpref')||'';
+    var h='<div class="sin"><div class="sh"><h1>'+esc(tr('setT'))+'</h1><button type="button" class="x" style="position:static" data-a="setx" aria-label="'+esc(tr('close'))+'">×</button></div>';
+    h+='<div class="sgt">'+esc(tr('setApp'))+'</div><div class="sg">';
+    h+=blk(tr('setLang'),seg('slang',[{v:'ca',l:'Català'},{v:'es',l:'Castellano'},{v:'en',l:'English'}],LANG));
+    h+=blk(tr('setTheme'),seg('sth',[{v:'auto',l:tr('thAuto')},{v:'light',l:tr('thLight')},{v:'dark',l:tr('thDark')}],THEME));
+    h+='</div><div class="sgt">'+esc(tr('setFilt'))+'</div><div class="sg">';
+    h+=blk(tr('setVeh'),seg('sveh',[{v:'',l:tr('vehAll')},{v:'car',l:tr('z_car')},{v:'moto',l:tr('z_moto')}],S.veh));
+    h+=blk(tr('setPmr'),seg('spmr',[{v:'',l:tr('pmrNo')},{v:'on',l:tr('pmrIn')},{v:'only',l:tr('pmrOnly2')}],S.pmr)+'<div class="hintp">'+esc(tr('pmrHint'))+'</div>');
+    h+=srow(tr('setFree'),tog('sfree',S.freeOnly),tr('setFreeS'));
+    h+=srow(tr('setEv'),tog('sev',S.evOnly),'');
+    h+='</div><div class="sgt">'+esc(tr('setNot'))+'</div><div class="sg">';
+    h+=blk(tr('setRadius'),seg('srad',[{v:500,l:'500 m'},{v:1000,l:'1 km'},{v:2000,l:'2 km'},{v:5000,l:'5 km'}],ZONE_M));
+    h+=blk(tr('setAlert'),seg('sal',[{v:0,l:tr('alOff')},{v:300,l:'300 m'},{v:600,l:'600 m'},{v:1000,l:'1 km'}],ALERT_M));
+    h+=srow(tr('setVib'),tog('svib',VIB),'');
+    h+=srow(tr('setAuto'),tog('sauto',AUTO),tr('setAutoS'));
+    h+='</div><div class="sgt">'+esc(tr('setLay'))+'</div><div class="sg">';
+    h+=srow(tr('lyEv'),tog('sly" data-v="ev',LAY.ev),tr('lyS'));
+    h+=srow(tr('lyPark'),tog('sly" data-v="park',LAY.park),tr('lyParkS'));
+    h+=srow(tr('lyPmr'),tog('sly" data-v="pmr',LAY.pmr),tr('lyPmrS'));
+    h+='</div><div class="sgt">'+esc(tr('setMore'))+'</div><div class="sg">';
+    h+=blk(tr('setNav'),seg('snav',[{v:'',l:tr('navAsk')},{v:'apple',l:'Apple'},{v:'google',l:'Google'},{v:'waze',l:'Waze'}],np));
+    h+=srow(tr('setPayAfter'),tog('spa',PAYAFTER),tr('setPayAfterS'));
+    h+='</div><details class="spriv"><summary>'+esc(tr('setPriv'))+'</summary><p>'+esc(tr('privTxt'))+'</p></details><div class="sabout">HUECCO · v26<br>'+esc(tr('setAbout'))+'</div></div>';
+    return h;
+  }
+  function renderSettings(){
+    var el=$('set'); if(!el) return;
+    if(!S.settings){ if(el.className!==''){ el.className=''; el.innerHTML=''; el._h=''; } return; }
+    var hh=settingsHtml();
+    if(el._h!==hh){ var top=el.scrollTop; el.innerHTML=hh; el._h=hh; el.className='open'; el.scrollTop=top; }
+  }
+  function render(){
+    var sumN=function(a){ return a.reduce(function(t,r){ return t+(r.left||1); },0); };
+    var zs=S.spots.filter(function(r){ return r.dz<=ZONE_M; });
+    var nearA=zs.filter(function(r){ return r.d!==null&&r.d<=NEAR_M; });
+    var n=sumN(zs), near={length:sumN(nearA)};
+    var badge=$('badge'), bt=$('bt'), bs=$('bs');
+    if(S.loadingMsg){ badge.className='badge none'; bt.textContent=S.loadingMsg; bs.textContent=''; }
+    else if(n){
+      badge.className='badge';
+      bt.innerHTML='<b class="num">'+n+'</b><span class="nl">'+esc(tr(n===1?'oneW':'manyW'))+'</span>';
+      bs.textContent=near.length&&S.pos?tr('near',[near.length,NEAR_M]):tr('zone',[ZONE_M/1000]);
+    }else{
+      badge.className='badge none'; bt.textContent=tr('none'); bs.textContent=tr('noneSub');
+    }
+    var h=$('hint');
+    if(S.gpsDenied&&!S.pos) h.textContent=tr('gps');
+    else if(S.error) h.textContent=S.error;
+    else h.textContent='';
+    var gb=$('gear'); if(gb) gb.className='lang';
+    renderSettings();
+
+    var CAR=getCar(), pl='';
+    if(CAR) pl+='<button type="button" data-a="car"'+(S.carOpen?' class="on"':'')+'>'+esc(tr('carT'))+'</button>';
+    if($('pills')._h!==pl){ $('pills').innerHTML=pl; $('pills')._h=pl; }
+
+    var t='';
+    if(S.notice) t='<div class="tbox'+(S.notice.tone?' tz-'+S.notice.tone:'')+'"><span>'+esc(S.notice.text)+'</span>'+(S.notice.undo?'<button type="button" data-a="undo" data-id="'+S.notice.undo+'">'+tr('undo')+'</button>':'')+toastAct(S.notice.act)+'</div>';
+    if($('toast')._h!==t){ $('toast').innerHTML=t; $('toast')._h=t; }
+
+    var c='', sp=null;
+    S.spots.forEach(function(r){ if(r.id===S.sel) sp=r; });
+    if(sp){ S.payOpen=false; S.poiSel=null; }
+    if(S.sheet){
+      var sh=S.sheet, sizes=['moto','small','medium','large'];
+      var chips=function(items,cur,act){ return '<div class="chips">'+items.map(function(it){ return '<button type="button" data-a="'+act+'" data-v="'+it.v+'"'+(String(cur)===String(it.v)?' class="on"':'')+'>'+esc(it.l)+'</button>'; }).join('')+'</div>'; };
+      c='<div class="card sheet"><button type="button" class="x" data-a="sheetx" aria-label="Cerrar">×</button>'+
+        '<h2>'+tr(sh.kind==='see'?'howmany':'howmanyGo')+'</h2>'+
+        (sh.kind==='see'?chips([{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4+'}],sh.n,'sn'):'')+
+        '<div class="sub">'+tr('sizeQ')+'</div>'+
+        chips(sizes.map(function(z){ return {v:z,l:tr('z_'+z)}; }),sh.size,'sz')+
+        '<div class="sub">'+tr('dirQ')+'</div>'+
+        chips([{v:'two',l:tr('d_two')},{v:'one',l:tr('d_one')}],sh.dir,'sd')+
+        '<div class="sub">'+tr('zoneQ')+'</div>'+
+        chips([{v:'free',l:tr('zs_free')},{v:'blue',l:tr('zs_blue')},{v:'green',l:tr('zs_green')},{v:'orange',l:tr('zs_orange')}],sh.zone,'sg')+
+        '<div class="chips"><button type="button" data-a="sp"'+(sh.pmr?' class="on pm"':'')+'>'+PMR_SVG+esc(tr('adaptedChip'))+'</button></div>'+
+        '<div class="chips"><button type="button" data-a="se"'+(sh.ev?' class="on"':'')+'>'+IC.charge+esc(tr('evChip'))+'</button></div>'+
+        '<div class="acts"><button type="button" class="ir" data-a="sheetsend">'+tr('send')+'</button></div></div>';
+    }else if(S.poiSel){
+      c=poiCard();
+    }else if(S.payOpen){
+      c=payCard();
+    }else if(S.carOpen&&CAR){
+      c='<div class="card"><button type="button" class="x" data-a="carx" aria-label="Cerrar">×</button>'+
+        '<h2>'+tr('carT')+'</h2>'+
+        '<div class="sub">'+(CAR.name?esc(CAR.name)+' · ':'')+(S.pos?distLabel(distPt(S.pos,[CAR.lat,CAR.lng]))+' · ':'')+tr('carSub',[durText(Date.now()-CAR.t)])+'</div>'+
+        '<div class="acts">'+navLinks(CAR)+'<button type="button" data-a="carforget">'+tr('carForget')+'</button></div></div>';
+    }else if(sp){
+      var voted=S.voted[sp.id];
+      var dirv=sp.dir||(function(){ var hh=streetAt([sp.lat,sp.lng]); return hh?(hh.ow?'one':'two'):''; })();
+      var tags='', tg=function(t,cls){ tags+='<span'+(cls?' class="'+cls+'"':'')+'>'+t+'</span>'; };
+      if(sp.adapted) tg(PMR_SVG+esc(tr('pmrShort')),'t-pm');
+      if(sp.ev) tg(IC.charge+esc(tr('evTag')),'t-ev');
+      if(sp.left>1) tg(esc(tr('spotsN',[sp.left])));
+      if(sp.size) tg(esc(tr('z_'+sp.size)));
+      if(sp.zone) tg('<i class="zdot z-'+sp.zone+'"></i>'+esc(tr('zn_'+sp.zone))+(isPaid(sp.zone)?' · '+esc(tr('payTag')):''),'t-'+sp.zone);
+      if(dirv) tg(esc(tr('d_'+dirv)));
+      var rl=sp.score>=75?'relHi':(sp.score>=50?'relMid':'relLow');
+      c='<div class="card"><button type="button" class="x" data-a="close" aria-label="Cerrar">×</button>'+
+        '<div class="ct"><i class="zd zd-'+toneOf(sp)+'"></i><h2>'+tr('cardT')+(sp.mine?' '+tr('mine'):'')+'</h2><span class="rel '+rl+'">'+esc(tr(rl))+'</span></div>'+
+        '<div class="sub">'+(sp.name&&sp.name!=='Zona'?esc(sp.name)+' · ':'')+(sp.d!==null?distLabel(sp.d)+' · ':'')+agoText(sp.t)+(sp.conf?' · '+tr('conf',[sp.conf]):'')+'</div>'+
+        (tags?'<div class="tags">'+tags+'</div>':'')+
+        '<div class="bar rl-'+rl+'"><i style="width:'+sp.score+'%"></i></div>'+
+        '<div class="acts">'+(S.navFor===sp.id?navLinks(sp):'<button type="button" class="ir" data-a="nav" data-id="'+sp.id+'">'+tr('go')+'</button>')+
+        (S.navFor===sp.id?'':sp.mine?'<button type="button" data-a="del" data-id="'+sp.id+'">'+tr('del')+'</button>':'<button type="button" data-a="vote" data-id="'+sp.id+'" data-v="1"'+(voted?' disabled':'')+'>'+(voted?tr('thanks'):tr('still'))+'</button>'+
+        (voted?'':'<button type="button" data-a="vote" data-id="'+sp.id+'" data-v="-1">'+tr('gone')+'</button>'))+'</div></div>';
+    }
+    var ck=(S.sheet?'sh'+S.sheet.kind:'')+(S.poiSel?'poi'+S.poiSel.lat:'')+(S.payOpen?'pay':'')+(S.carOpen?'car':'')+(sp?sp.id:'');
+    if(c&&ck!==$('card')._k) c=c.replace('<div class="card','<div class="card enter');
+    $('card')._k=ck;
+    if($('card')._h!==c){ $('card').innerHTML=c; $('card')._h=c; }
+    renderMap();
+  }
+
+
+  function applyLang(){
+    document.documentElement.lang=LANG;
+    var ico={go:IC.leave,park:IC.park,see:IC.eye};
+    $('bgo').innerHTML='<span class="ic">'+ico.go+'</span><span class="lb">'+tr('bGo')+'</span>';
+    $('bpark').innerHTML='<span class="ic">'+ico.park+'</span><span class="lb">'+tr('bPk')+'</span>';
+    $('bsee').innerHTML='<span class="ic">'+ico.see+'</span><span class="lb">'+tr('bSee')+'</span>';
+    if(S.loadingMsg) S.loadingMsg=tr('loading');
+  }
+  var onbStep=0;
+  function onbRender(){
+    var st=[['o1t','o1'],['o2t','o2'],['o3t','o3']][onbStep];
+    var dots=''; for(var i=0;i<3;i++) dots+='<i style="width:'+(i===onbStep?24:8)+'px"></i>';
+    $('onb').innerHTML='<div class="onbbox"><div class="onbp">'+LOGO+'</div><h1>'+esc(tr(st[0]))+'</h1><p>'+esc(tr(st[1]))+'</p>'+
+      (onbStep===2?'<p class="tip">'+esc(tr('tip'))+'</p>':'')+'<div class="dots">'+dots+'</div><button type="button" id="onbn">'+esc(tr(onbStep===2?'start':'next'))+'</button></div>';
+  }
+  function setupOnb(){
+    if(lsGet('hueco-onb')){ $('onb').style.display='none'; startGPS(); return; }
+    $('onb').style.display='flex'; onbRender();
+  }
+
+  /* ---------- acciones ---------- */
+  function openSheet(kind){
+    if(Date.now()-(S.last[kind==='go'?'leaving':kind]||0)<COOLDOWN){ showToast(tr('wait'),null,3500); return; }
+    S.sel=null; S.carOpen=false; var hs=S.pos?streetAt(S.pos):null; S.sheet={kind:kind,n:1,size:'',zone:'',pmr:false,ev:false,dir:hs?(hs.ow?'one':'two'):''}; render();
+  }
+  function send(kind0,ex){
+    ex=ex||{};
+    var see=(kind0==='see'), kind=see?'leaving':kind0;
+    var now=Date.now();
+    if(now-(S.last[kind0]||0)<COOLDOWN){ showToast(tr('wait'),null,3500); return; }
+    needPos(function(ok){
+      if(!ok){ S.gpsDenied=true; S.pick=kind0; S.pickEx=ex; clearTimeout(S.pickT); S.pickT=setTimeout(function(){ S.pick=null; },10000); showToast(tr('pick'),null,9000); return; }
+      ensureStreets(S.pos); var pos=S.pos, wasManual=S.manual; S.manual=false; if(wasManual) S.pos=null;
+      var p=[round4(pos[0]),round4(pos[1])];
+      if(see){
+        // Si ya hay un hueco avisado a menos de 15 m, no se duplica: se confirma.
+        var dup=null;
+        S.spots.forEach(function(s){ if(!dup&&!s.mine&&distPt(pos,[s.lat,s.lng])<=15) dup=s; });
+        if(dup){
+          if(!S.voted[dup.id]){ S.voted[dup.id]=true; dup.conf++; backend.vote(dup.id,1).then(refresh).then(render); }
+          S.sel=dup.id; showToast(tr('dup'),null,5000); return;
+        }
+      }
+      var nm=streetNameAt(pos);
+      var r={id:uuid(),street:nm?norm(nm).slice(0,80):'zona',street_name:(nm||'Zona').slice(0,80),event:kind,lat:p[0],lng:p[1],spots:(kind==='leaving'&&ex.n>1)?ex.n:1,size:(kind==='leaving'&&ex.size)?ex.size:'',zone:(kind==='leaving'&&ex.zone)?ex.zone:'',dir:(kind==='leaving'&&ex.dir)?ex.dir:'',adapted:!!(kind==='leaving'&&ex.pmr),ev:!!(kind==='leaving'&&ex.ev)};
+      S.last[kind0]=now;
+      backend.add(r).then(function(){
+        addMine(r.id);
+        S.reports.push({id:r.id,event:kind,name:r.street_name,lat:p[0],lng:p[1],t:Date.now(),conf:0,deny:0,mine:true,n:r.spots,size:r.size,zone:r.zone,dir:r.dir,adapted:r.adapted,ev:r.ev});
+        S.seen[r.id]=true; if(r.adapted&&!S.pmr){ S.pmr='on'; lsSet('hueco-pmr','on'); } computeSpots();
+        S.spots.forEach(function(s){ if(s.id===r.id) s.mine=true; });
+        if(see){ showToast(tr('sentSee'),r.id,1600); if(map) map.setView(p,Math.max(map.getZoom(),17)); }
+        else if(kind==='leaving'){ showToast(tr('sentGo'),r.id,1600); if(map) map.setView(p,Math.max(map.getZoom(),17)); }
+        else{ S.dest=null; lsSet('hueco-car',JSON.stringify({lat:p[0],lng:p[1],t:Date.now(),name:nm||''})); if(PAYAFTER){ S.notice=null; S.payOpen=true; S.payAfter=true; S.sel=null; S.carOpen=false; } else showToast(tr('parked')+tr('carSaved'),null,9000,'see'); }
+        render(); refresh().then(function(){ S.spots.forEach(function(s){ if(s.id===r.id) s.mine=true; }); render(); });
+      }).catch(function(e){ S.last[kind0]=0; showToast(tr('fail',[e.message]),null,6000); });
+    });
+  }
+  document.addEventListener('click',function(ev){
+    var b=ev.target.closest?ev.target.closest('button,[data-a]'):null; if(!b) return;
+    var id=b.id, a=b.getAttribute('data-a');
+    try{ if(navigator.vibrate&&(id==='bgo'||id==='bpark'||id==='bsee')) navigator.vibrate(8); }catch(e){}
+    if(id==='bgo'){ if(S.sheet&&S.sheet.kind==='go'){ S.sheet=null; render(); } else openSheet('go'); }
+    else if(id==='bpark') send('parked');
+    else if(id==='bsee'){ if(S.sheet&&S.sheet.kind==='see'){ S.sheet=null; render(); } else openSheet('see'); }
+    else if(id==='onbn'){ if(onbStep<2){ onbStep++; onbRender(); } else { lsSet('hueco-onb','1'); $('onb').style.display='none'; startGPS(); } }
+    else if(id==='gear'){ S.settings=true; S.sheet=null; S.payOpen=false; S.carOpen=false; render(); }
+    else if(a==='apy'){ S.notice=null; send('parked'); }
+    else if(a==='agy'){ S.notice=null; render(); lsSet('hueco-car','null'); openSheet('go'); }
+    else if(a==='ano'){ S.notice=null; AD.lastAsk=Date.now()+10*60000; render(); }
+    else if(a==='sauto'){ AUTO=!AUTO; lsSet('hueco-auto',AUTO?'1':'0'); render(); }
+    else if(a==='sly'){ var lk=b.getAttribute('data-v'); LAY[lk]=!LAY[lk]; lsSet('hueco-ly-'+(lk==='park'?'pk':(lk==='pmr'?'pm':'ev')),LAY[lk]?'1':'0'); var rp=refPoint(); if(rp) ensurePoi([rp[0]!==undefined?rp[0]:rp.lat,rp[1]!==undefined?rp[1]:rp.lng]); render(); }
+    else if(a==='setx'){ S.settings=false; render(); }
+    else if(a==='slang'){ LANG=b.getAttribute('data-v'); lsSet('hueco-lang',LANG); applyLang(); render(); }
+    else if(a==='sth'){ THEME=b.getAttribute('data-v'); lsSet('hueco-theme',THEME); applyTheme(); render(); }
+    else if(a==='sveh'){ S.veh=b.getAttribute('data-v'); lsSet('hueco-veh',S.veh); computeSpots(); render(); }
+    else if(a==='spmr'){ S.pmr=b.getAttribute('data-v'); lsSet('hueco-pmr',S.pmr); computeSpots(); render(); }
+    else if(a==='sfree'){ S.freeOnly=!S.freeOnly; lsSet('hueco-free',S.freeOnly?'1':'0'); computeSpots(); render(); }
+    else if(a==='sev'){ S.evOnly=!S.evOnly; lsSet('hueco-ev',S.evOnly?'1':'0'); computeSpots(); render(); }
+    else if(a==='srad'){ ZONE_M=Number(b.getAttribute('data-v')); lsSet('hueco-radius',String(ZONE_M)); computeSpots(); render(); }
+    else if(a==='sal'){ ALERT_M=Number(b.getAttribute('data-v')); lsSet('hueco-alert',String(ALERT_M)); render(); }
+    else if(a==='svib'){ VIB=!VIB; lsSet('hueco-vib',VIB?'1':'0'); if(VIB){ try{ navigator.vibrate&&navigator.vibrate(60); }catch(e){} } render(); }
+    else if(a==='snav'){ lsSet('hueco-navpref',b.getAttribute('data-v')); render(); }
+    else if(a==='spa'){ PAYAFTER=!PAYAFTER; lsSet('hueco-payafter',PAYAFTER?'1':'0'); render(); }
+    else if(a==='spay'){ S.settings=false; S.payOpen=true; S.sel=null; render(); }
+    else if(a==='scar'){ lsSet('hueco-car','null'); S.carOpen=false; render(); }
+    else if(a==='sonb'){ S.settings=false; onbStep=0; $('onb').style.display='flex'; onbRender(); render(); }
+
+    else if(id==='loc'){ needPos(function(ok){ if(ok&&map) map.setView(S.pos,17); else showToast(tr('nogps'),null,4000); }); }
+    else if(a==='all'){ var zf=S.spots.filter(function(r){ return r.dz<=ZONE_M; }); if(map&&zf.length){ map.fit(zf.map(function(r){ return [r.lat,r.lng]; })); } }
+    else if(a==='close'){ S.poiSel=null; S.sel=null; S.navFor=null; render(); }
+    else if(a==='nav'){
+      var nid=b.getAttribute('data-id'), np=lsGet('hueco-navpref')||'', nsp=S.spots.filter(function(x){ return x.id===nid; })[0];
+      if(np&&nsp){ var na=navApps(nsp).filter(function(x){ return x[0]===np; })[0]; S.dest={id:nid,t:Date.now()}; lsSet('hueco-nav',np); if(na) window.open(na[2],'_blank'); }
+      else{ S.navFor=nid; render(); }
+    }
+    else if(a==='navgo'){ lsSet('hueco-nav',b.getAttribute('data-app')); if(S.navFor) S.dest={id:S.navFor,t:Date.now()}; }
+    else if(a==='gonew'){ S.sel=b.getAttribute('data-id'); S.navFor=S.sel; S.notice=null; S.carOpen=false; render(); }
+    else if(a==='free'){ S.freeOnly=!S.freeOnly; lsSet('hueco-free',S.freeOnly?'1':'0'); computeSpots(); render(); }
+    else if(a==='veh'){ var vs=['','car','moto']; S.veh=vs[(vs.indexOf(S.veh)+1)%vs.length]; lsSet('hueco-veh',S.veh); computeSpots(); render(); }
+    else if(a==='ev'){ S.evOnly=!S.evOnly; lsSet('hueco-ev',S.evOnly?'1':'0'); computeSpots(); render(); }
+    else if(a==='pmr'){ S.pmr=S.pmr===''?'on':(S.pmr==='on'?'only':''); lsSet('hueco-pmr',S.pmr); computeSpots(); render(); }
+    else if(a==='theme'){ THEME=THEME==='auto'?'light':(THEME==='light'?'dark':'auto'); lsSet('hueco-theme',THEME); applyTheme(); render(); }
+    else if(a==='pay'){ S.payOpen=!S.payOpen; S.payAfter=false; S.carOpen=false; S.sel=null; S.sheet=null; render(); }
+    else if(a==='poix'){ S.poiSel=null; render(); }
+    else if(a==='payx'){ S.payOpen=false; S.payAfter=false; render(); }
+    else if(a==='car'){ S.carOpen=!S.carOpen; S.sel=null; S.sheet=null; render(); if(S.carOpen&&map){ var cc=getCar(); if(cc) map.setView([cc.lat,cc.lng],Math.max(map.getZoom(),17)); } }
+    else if(a==='carx'){ S.carOpen=false; render(); }
+    else if(a==='carforget'){ lsSet('hueco-car','null'); S.carOpen=false; render(); }
+    else if(a==='sd'&&S.sheet){ var dv=b.getAttribute('data-v'); S.sheet.dir=(S.sheet.dir===dv?'':dv); render(); }
+    else if(a==='se'&&S.sheet){ S.sheet.ev=!S.sheet.ev; render(); }
+    else if(a==='sp'&&S.sheet){ S.sheet.pmr=!S.sheet.pmr; render(); }
+    else if(a==='sg'&&S.sheet){ var gv=b.getAttribute('data-v'); S.sheet.zone=(S.sheet.zone===gv?'':gv); render(); }
+    else if(a==='opensee'){ S.notice=null; openSheet('see'); }
+    else if(a==='sheetx'){ S.sheet=null; render(); }
+    else if(a==='sn'&&S.sheet){ S.sheet.n=Number(b.getAttribute('data-v')); render(); }
+    else if(a==='sz'&&S.sheet){ var zv=b.getAttribute('data-v'); S.sheet.size=(S.sheet.size===zv?'':zv); render(); }
+    else if(a==='sheetsend'&&S.sheet){ var sh2=S.sheet; S.sheet=null; render(); send(sh2.kind==='see'?'see':'leaving',{n:sh2.kind==='see'?sh2.n:1,size:sh2.size,zone:sh2.zone,dir:sh2.dir,pmr:sh2.pmr,ev:sh2.ev}); }
+    else if(a==='undo'){
+      var uid=b.getAttribute('data-id'); S.notice=null; S.last={};
+      S.reports=S.reports.filter(function(r){ return r.id!==uid; }); computeSpots(); render();
+      backend.cancel(uid).then(refresh).then(render);
+    }
+    else if(a==='del'){
+      var did=b.getAttribute('data-id'); S.sel=null; S.last={};
+      S.reports=S.reports.filter(function(r){ return r.id!==did; }); computeSpots(); render();
+      backend.cancel(did).then(refresh).then(render);
+    }
+    else if(a==='ghost'){
+      var gid2=b.getAttribute('data-id'); S.voted[gid2]=true; S.notice=null;
+      var go=(S.ghosts||[]).filter(function(x){ return x.id===gid2; })[0];
+      if(go){
+        var nr={id:uuid(),street:norm(go.name||'zona').slice(0,80),street_name:(go.name||'Zona').slice(0,80),event:'leaving',lat:go.lat,lng:go.lng,spots:go.n||1,size:go.size||'',zone:go.zone||'',dir:go.dir||'',adapted:!!go.adapted,ev:!!go.ev};
+        backend.vote(gid2,1).catch(function(){});
+        backend.add(nr).then(function(){
+          S.reports.push({id:nr.id,event:'leaving',name:nr.street_name,lat:nr.lat,lng:nr.lng,t:Date.now(),conf:0,deny:0,n:nr.spots,size:nr.size,zone:nr.zone,dir:nr.dir,adapted:nr.adapted,ev:nr.ev});
+          S.seen[nr.id]=true; computeSpots(); showToast(tr('thx2'),null,4000); render();
+        }).catch(function(){ showToast(tr('srv',['—']),null,4000); });
+      }
+      render();
+    }
+    else if(a==='vote'){
+      var vid=b.getAttribute('data-id'), v=Number(b.getAttribute('data-v'));
+      S.voted[vid]=true; S.notice=null;
+      S.reports.forEach(function(r){ if(r.id===vid){ if(v>0) r.conf++; else r.deny++; } });
+      computeSpots(); if(v<0) S.sel=null; render();
+      backend.vote(vid,v).then(refresh).then(render);
+    }
+  });
+
+  /* ---------- arranque ---------- */
+  function start(){
+    var sp0=$('splash');
+    if(sp0){
+      var wd='HUECCO'.split('').map(function(c){return '<span>'+c+'</span>';}).join('');
+      sp0.innerHTML='<svg viewBox="0 0 120 120" aria-label="HUECCO"><defs><linearGradient id="cg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#D4FF3A" stop-opacity=".7"/><stop offset="1" stop-color="#D4FF3A" stop-opacity="0"/></linearGradient><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4FF3A" stop-opacity=".6"/><stop offset="1" stop-color="#D4FF3A" stop-opacity="0"/></linearGradient></defs><line class="road" x1="60" y1="-220" x2="60" y2="340"/><rect class="hb hb-l" x="20" y="16" width="22" height="88" rx="4"/><rect class="hb hb-r" x="78" y="16" width="22" height="88" rx="4"/><circle class="ping" cx="60" cy="60" r="16"/><circle class="ping2" cx="60" cy="60" r="16"/><g class="car"><polygon class="cone" points="52,46 68,46 80,-34 40,-34" fill="url(#cg)"/><polygon class="trail" points="52,74 68,74 64,170 56,170" fill="url(#tg)"/><rect class="blk" x="50" y="46" width="20" height="28" rx="4"/></g></svg><div class="sw-word" aria-label="HUECCO">'+wd+'</div>';
+      var done=false, endSplash=function(){ if(done) return; done=true; sp0.className='splash play hide'; setTimeout(function(){ if(sp0.parentNode) sp0.parentNode.removeChild(sp0); },450); };
+      sp0.className='splash play'; sp0.addEventListener('click',endSplash); setTimeout(endSplash,2400);
+    }
+    S.loadingMsg=tr('loading'); render();
+    applyLang(); initMap(); setupOnb();
+    if(!REMOTE) seedDemo();
+    refresh().then(function(){ S.loadingMsg=''; render(); });
+    setInterval(function(){ if(!REMOTE) seedDemo(); refresh().then(render); },POLL);
+    setInterval(function(){ computeSpots(); render(); },10000);
+    // Nombres de calle: se cargan en segundo plano donde estés; si fallan, la app funciona igual.
+    try{ localStorage.removeItem('plazas-calles-v2'); localStorage.removeItem('plazas-calles-v1'); }catch(e){}
+    ensureStreets([(B[0]+B[2])/2,(B[1]+B[3])/2]);
+  }
+  if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+  start();
+})();
+
+</script>
+</body>
+</html>
