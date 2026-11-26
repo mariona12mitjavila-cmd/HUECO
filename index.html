@@ -292,6 +292,21 @@ html[data-theme=dark] .fab,html[data-theme=dark] .lang{color:var(--txt)}html[dat
 .poi{width:40px;height:40px;border-radius:14px}.poi .ic24{width:22px;height:22px}
 .poi.k-ev{background:#2336FF;color:#fff}html[data-theme=dark] .poi.k-ev{background:#6C82FF;color:#0A0B0F}
 .spotwrap:has(.me){z-index:1!important}.spotwrap:has(.poi){z-index:2!important}.spotwrap:has(.pt){z-index:3!important}
+/* v28: marcador P bien visible */
+.pt{width:52px;height:52px}
+.pt i{width:46px;height:46px;border:3px solid var(--sp);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--onink);box-shadow:0 4px 14px var(--shadow);font-style:normal;line-height:1}
+.pt i b{font-family:Sora,sans-serif;font-weight:700;font-size:19px}
+.pt i s{text-decoration:none;font-size:10.5px;font-weight:700;margin-top:1px}
+.pt.zg i,.pt.zb i,.pt.zo i{color:#fff}
+.pt.sel i{transform:scale(1.2)}
+.pt .bd{left:34px;top:0}.pt .bd2{left:34px;top:24px}.pt .cnt{left:0;top:0}
+.pt.fresh::before{content:'';position:absolute;width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);opacity:0;animation:pulse 2.6s ease-out infinite}
+.pt.zg.fresh::before{border-color:var(--zg)}.pt.zb.fresh::before{border-color:var(--zb)}.pt.zo.fresh::before{border-color:var(--zo)}
+/* v29: lliure = llima de la marca */
+.pt.zf i{background:#D4FF3A;color:#0A1200}
+.pt.zf.fresh::before{border-color:#D4FF3A}
+.tbox.tz-free::before{background:#D4FF3A}
+.zdot{background:#D4FF3A;box-shadow:inset 0 0 0 1px rgba(10,18,0,.25)}.zdot.z-blue{background:var(--zb);box-shadow:none}.zdot.z-green{background:var(--zg);box-shadow:none}.zdot.z-orange{background:var(--zo);box-shadow:none}
 </style>
 </head>
 <body>
@@ -890,7 +905,8 @@ var lastTap=0;document.addEventListener('touchend',function(e){var n=Date.now();
     var m=Math.floor((Date.now()-r.t)/60000), z=r.zone==='blue'?'zb':(r.zone==='green'?'zg':(r.zone==='orange'?'zo':'zf'));
     var bd=(r.adapted?'<u class="bd">'+IC.access+'</u>':(r.ev?'<u class="bd">'+IC.charge+'</u>':''));
     var bd2=(r.adapted&&r.ev)?'<u class="bd bd2">'+IC.charge+'</u>':'';
-    return '<div class="pt '+z+(sel?' sel':'')+(m>=10?' old':'')+'"><i></i>'+bd+bd2+(r.left>1?'<em class="cnt">'+r.left+'</em>':'')+'</div>';
+    var ml=(m<1?(LANG==='ca'?'ara':(LANG==='en'?'now':'ya')):m+"'");
+    return '<div class="pt '+z+(sel?' sel':'')+(m>=10?' old':'')+(m<5?' fresh':'')+'"><i><b>P</b><s>'+ml+'</s></i>'+bd+bd2+(r.left>1?'<em class="cnt">'+r.left+'</em>':'')+'</div>';
   }
   function renderMap(){
     if(!map) return;
@@ -1037,7 +1053,7 @@ var lastTap=0;document.addEventListener('touchend',function(e){var n=Date.now();
     h+='</div><div class="sgt">'+esc(tr('setMore'))+'</div><div class="sg">';
     h+=blk(tr('setNav'),seg('snav',[{v:'',l:tr('navAsk')},{v:'apple',l:'Apple'},{v:'google',l:'Google'},{v:'waze',l:'Waze'}],np));
     h+=srow(tr('setPayAfter'),tog('spa',PAYAFTER),tr('setPayAfterS'));
-    h+='</div><details class="spriv"><summary>'+esc(tr('setPriv'))+'</summary><p>'+esc(tr('privTxt'))+'</p></details><div class="sabout">HUECCO · v26<br>'+esc(tr('setAbout'))+'</div></div>';
+    h+='</div><details class="spriv"><summary>'+esc(tr('setPriv'))+'</summary><p>'+esc(tr('privTxt'))+'</p></details><div class="sabout">HUECCO · v29<br>'+esc(tr('setAbout'))+'</div></div>';
     return h;
   }
   function renderSettings(){
@@ -1086,8 +1102,6 @@ var lastTap=0;document.addEventListener('touchend',function(e){var n=Date.now();
         (sh.kind==='see'?chips([{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4+'}],sh.n,'sn'):'')+
         '<div class="sub">'+tr('sizeQ')+'</div>'+
         chips(sizes.map(function(z){ return {v:z,l:tr('z_'+z)}; }),sh.size,'sz')+
-        '<div class="sub">'+tr('dirQ')+'</div>'+
-        chips([{v:'two',l:tr('d_two')},{v:'one',l:tr('d_one')}],sh.dir,'sd')+
         '<div class="sub">'+tr('zoneQ')+'</div>'+
         chips([{v:'free',l:tr('zs_free')},{v:'blue',l:tr('zs_blue')},{v:'green',l:tr('zs_green')},{v:'orange',l:tr('zs_orange')}],sh.zone,'sg')+
         '<div class="chips"><button type="button" data-a="sp"'+(sh.pmr?' class="on pm"':'')+'>'+PMR_SVG+esc(tr('adaptedChip'))+'</button></div>'+
@@ -1153,7 +1167,7 @@ var lastTap=0;document.addEventListener('touchend',function(e){var n=Date.now();
   /* ---------- acciones ---------- */
   function openSheet(kind){
     if(Date.now()-(S.last[kind==='go'?'leaving':kind]||0)<COOLDOWN){ showToast(tr('wait'),null,3500); return; }
-    S.sel=null; S.carOpen=false; var hs=S.pos?streetAt(S.pos):null; S.sheet={kind:kind,n:1,size:'',zone:'',pmr:false,ev:false,dir:hs?(hs.ow?'one':'two'):''}; render();
+    S.sel=null; S.carOpen=false; var hs=S.pos?streetAt(S.pos):null; S.sheet={kind:kind,n:1,size:(S.veh==='moto'?'moto':'medium'),zone:'free',pmr:false,ev:false,dir:hs?(hs.ow?'one':'two'):''}; render();
   }
   function send(kind0,ex){
     ex=ex||{};
