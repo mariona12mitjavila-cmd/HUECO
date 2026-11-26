@@ -1,6 +1,6 @@
 // Service worker mínimo: guarda la «carcasa» de la app para abrirla rápido.
 // No guarda avisos ni mapas: eso siempre va a la red.
-var CACHE = 'hueco-shell-v29';
+var CACHE = 'hueco-shell-v30';
 var SHELL = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', function (e) {
