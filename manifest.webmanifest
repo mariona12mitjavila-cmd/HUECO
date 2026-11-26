@@ -1,0 +1,16 @@
+{
+  "name": "HUECCO",
+  "short_name": "HUECCO",
+  "description": "Avisos anónimos entre vecinos de plazas de aparcamiento que se liberan.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#2336FF",
+  "theme_color": "#2336FF",
+  "lang": "es",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
